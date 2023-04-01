@@ -1,5 +1,11 @@
 import { StyleSheet } from "react-native";
-import { base_color, fourth_color, second_color, third_color } from "./vars";
+import {
+  base_color,
+  fontSize,
+  fourth_color,
+  second_color,
+  third_color,
+} from "./vars";
 
 export const calendarStyles = StyleSheet.create({
   calendarContainer: {
@@ -26,15 +32,16 @@ export const calendarStyles = StyleSheet.create({
   ul: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-around",
     flexWrap: "wrap",
     margin: 0,
     padding: 0,
+    position: "relative",
   },
   liMonth: {
     textTransform: "uppercase",
     letterSpacing: 3,
-    fontSize: 16,
+    fontSize: fontSize,
   },
   days: {
     paddingTop: 30,
@@ -46,7 +53,7 @@ export const calendarStyles = StyleSheet.create({
     justifyContent: "center",
     alignSelf: "center",
     textAlign: "center",
-    fontSize: 14,
+    fontSize: 0.87 * fontSize,
     color: second_color,
   },
   notInMonth: {
@@ -65,7 +72,6 @@ export const calendarStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: second_color,
     borderRadius: 100,
-    borderColor: second_color,
   },
 });
 // @media screen and (max-width: 500px): {

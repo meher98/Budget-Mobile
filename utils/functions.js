@@ -20,21 +20,25 @@ export const weekParams = (y, m, indexW, w) => {
     if (m === 12) {
       return [y + 1, 1, 0];
     } else {
-      return [y, m + 1, 0];
+      return [y, m + 2, 0];
     }
   } else {
-    return [y, m, indexW];
+    return [y, m + 1, indexW];
   }
 };
 
 export const getWeekFromDate = (y, m, d) => {
-  const weeks = new JsonCalendar({ languageCode: "fr", monthIndex: m, year: y })
-    .weeks;
+  const weeks = new JsonCalendar({
+    languageCode: "fr",
+    monthIndex: m,
+    year: y,
+  }).weeks;
   var indexW;
   weeks.map((w, wi) =>
     // eslint-disable-next-line array-callback-return
     w.map((e) => {
-      if (e.day === d && e.className.includes("month-day")) {
+      console.log(weeks);
+      if (e.day === d && e.monthIndex === m) {
         indexW = wi;
       }
     })

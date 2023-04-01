@@ -11,16 +11,6 @@ import { Octicons, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { deg } from "react-native-linear-gradient-degree";
 import Textc from "./Textc";
-import {
-  BsBarChartLineFill,
-  BsCalendarFill,
-  BsFillBagFill,
-  BsFillBasket3Fill,
-  BsFillCartFill,
-  BsFillGrid3X3GapFill,
-} from "react-icons/bs";
-import { HiOutlineBars3 } from "react-icons/hi2";
-import { FaMoneyBillWaveAlt } from "react-icons/fa";
 import { Image } from "react-native";
 import { DateContext, getWeekFromDate } from "../utils/functions";
 import { sidebarStyles } from "../styles/sidebar";
@@ -33,7 +23,6 @@ import {
 } from "../styles/vars";
 import { Keyboard } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { testDB } from "../backEnd/options";
 
 export default function Sidebar(props) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -42,9 +31,10 @@ export default function Sidebar(props) {
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  const dateType = useContext(DateContext);
   const [open, setOpen] = useState(false);
-  const [currentRoute, setCurrentRoute] = useState("");
+  const [pageDate, setPageDate, type, setType, currentRoute, setCurrentRoute] =
+    useContext(DateContext);
+
   const navigation = useNavigation();
   const handleSidebar = () => {
     setOpen(!open);
@@ -54,6 +44,7 @@ export default function Sidebar(props) {
     const backAction = () => {
       navigation?.navigate("Home");
       setCurrentRoute("Home");
+
       return true;
     };
 
@@ -63,7 +54,7 @@ export default function Sidebar(props) {
     );
 
     return () => backHandler.remove();
-  }, []);
+  }, [currentRoute]);
   useEffect(() => {
     if (useEffectCounter.current > 0) {
       Animated.timing(scaleAnim, {
@@ -73,7 +64,6 @@ export default function Sidebar(props) {
       }).start();
     }
     useEffectCounter.current += +1;
-    testDB();
   }, [open]);
 
   const screenW = Dimensions.get("window").width;
@@ -158,7 +148,7 @@ export default function Sidebar(props) {
                   : {},
               ]}
               onPress={() => {
-                setCurrentRoute("Graphique");
+                setCurrentRoute("Home");
                 navigation?.navigate("Home");
               }}
             >
@@ -224,42 +214,6 @@ export default function Sidebar(props) {
             <TouchableOpacity
               style={[
                 sidebarStyles.sidebarItem,
-                navigation?.getCurrentRoute()?.name === "Graphique" ||
-                currentRoute === "Graphique"
-                  ? sidebarStyles.active
-                  : {},
-              ]}
-              onPress={() => {
-                setCurrentRoute("Graphique");
-                navigation?.navigate("Graphique");
-              }}
-            >
-              {/* <BsBarChartLineFill /> */}
-              <Ionicons
-                name="md-bar-chart"
-                size={22}
-                color={
-                  navigation?.getCurrentRoute()?.name === "Graphique" ||
-                  currentRoute === "Graphique"
-                    ? base_color
-                    : fourth_color
-                }
-              />
-              <Textc
-                color={
-                  navigation?.getCurrentRoute()?.name === "Graphique" ||
-                  currentRoute === "Graphique"
-                    ? "base"
-                    : "fourth"
-                }
-                style={sidebarStyles.gradientText}
-              >
-                Graphique
-              </Textc>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                sidebarStyles.sidebarItem,
                 navigation?.getCurrentRoute()?.name === "Calendrier" ||
                 currentRoute === "Calendrier"
                   ? sidebarStyles.active
@@ -298,8 +252,8 @@ export default function Sidebar(props) {
                 sidebarStyles.sidebarItem,
                 (navigation?.getCurrentRoute()?.name === "depenses" ||
                   currentRoute === "depenses") &&
-                dateType[0] === `${year}-${month}-${day}` &&
-                dateType[2] === "jour"
+                pageDate === `${year}-${month}-${day}` &&
+                type === "jour"
                   ? sidebarStyles.active
                   : {},
               ]}
@@ -317,8 +271,8 @@ export default function Sidebar(props) {
                 color={
                   (navigation?.getCurrentRoute()?.name === "depenses" ||
                     currentRoute === "depenses") &&
-                  dateType[0] === `${year}-${month}-${day}` &&
-                  dateType[2] === "jour"
+                  pageDate === `${year}-${month}-${day}` &&
+                  type === "jour"
                     ? base_color
                     : fourth_color
                 }
@@ -327,8 +281,8 @@ export default function Sidebar(props) {
                 color={
                   (navigation?.getCurrentRoute()?.name === "depenses" ||
                     currentRoute === "depenses") &&
-                  dateType[0] === `${year}-${month}-${day}` &&
-                  dateType[2] === "jour"
+                  pageDate === `${year}-${month}-${day}` &&
+                  type === "jour"
                     ? "base"
                     : "fourth"
                 }
@@ -342,16 +296,16 @@ export default function Sidebar(props) {
                 sidebarStyles.sidebarItem,
                 (navigation?.getCurrentRoute()?.name === "depenses" ||
                   currentRoute === "depenses") &&
-                dateType[0] === getWeekFromDate(year, month, day) &&
-                dateType[2] === "jour"
+                pageDate === getWeekFromDate(year, month - 1, day) &&
+                type === "semaine"
                   ? sidebarStyles.active
                   : {},
               ]}
               onPress={() => {
                 setCurrentRoute("depenses");
                 navigation.navigate("depenses", {
-                  type: "jour",
-                  date: getWeekFromDate(year, month, day),
+                  type: "semaine",
+                  date: getWeekFromDate(year, month - 1, day),
                 });
               }}
             >
@@ -361,8 +315,8 @@ export default function Sidebar(props) {
                 color={
                   (navigation?.getCurrentRoute()?.name === "depenses" ||
                     currentRoute === "depenses") &&
-                  dateType[0] === getWeekFromDate(year, month, day) &&
-                  dateType[2] === "jour"
+                  pageDate === getWeekFromDate(year, month - 1, day) &&
+                  type === "semaine"
                     ? base_color
                     : fourth_color
                 }
@@ -371,8 +325,8 @@ export default function Sidebar(props) {
                 color={
                   (navigation?.getCurrentRoute()?.name === "depenses" ||
                     currentRoute === "depenses") &&
-                  dateType[0] === getWeekFromDate(year, month, day) &&
-                  dateType[2] === "jour"
+                  pageDate === getWeekFromDate(year, month - 1, day) &&
+                  type === "semaine"
                     ? "base"
                     : "fourth"
                 }
@@ -386,8 +340,8 @@ export default function Sidebar(props) {
                 sidebarStyles.sidebarItem,
                 (navigation?.getCurrentRoute()?.name === "depenses" ||
                   currentRoute === "depenses") &&
-                dateType[0] === `${year}-${month}` &&
-                dateType[2] === "mois"
+                pageDate === `${year}-${month}` &&
+                type === "mois"
                   ? sidebarStyles.active
                   : {},
               ]}
@@ -405,8 +359,8 @@ export default function Sidebar(props) {
                 color={
                   (navigation?.getCurrentRoute()?.name === "depenses" ||
                     currentRoute === "depenses") &&
-                  dateType[0] === `${year}-${month}` &&
-                  dateType[2] === "mois"
+                  pageDate === `${year}-${month}` &&
+                  type === "mois"
                     ? base_color
                     : fourth_color
                 }
@@ -415,8 +369,8 @@ export default function Sidebar(props) {
                 color={
                   (navigation?.getCurrentRoute()?.name === "depenses" ||
                     currentRoute === "depenses") &&
-                  dateType[0] === `${year}-${month}` &&
-                  dateType[2] === "mois"
+                  pageDate === `${year}-${month}` &&
+                  type === "mois"
                     ? "base"
                     : "fourth"
                 }
@@ -492,12 +446,12 @@ export default function Sidebar(props) {
 //           </div>
 //           <div
 //             className={`sidebar-item ${
-//               href === `/depenses/semaine/${getWeekFromDate(year, month, day)}`
+//               href === `/depenses/semaine/${getWeekFromDate(year, month-1, day)}`
 //                 ? "active"
 //                 : ""
 //             }`}
 //             onClick={() =>
-//               navigate(`/depenses/semaine/${getWeekFromDate(year, month, day)}`)
+//               navigate(`/depenses/semaine/${getWeekFromDate(year, month-1, day)}`)
 //             }
 //           >
 //             <BsFillBasket3Fill />

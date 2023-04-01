@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { calendarStyles } from "../styles/calendar";
 import { verifWeekInMonth, weekParams } from "../utils/functions";
+import { AntDesign } from "@expo/vector-icons";
 import Grid from "./Grid";
 import Textc from "./Textc";
+import { base_color } from "../styles/vars";
 
 export default function Calendar({
   initialMonth,
@@ -75,14 +77,15 @@ export default function Calendar({
         <View style={[calendarStyles.ul]}>
           {allowChangeMonth ? (
             <TouchableOpacity onPress={() => prevMonth()}>
-              <Textc
+              {/* <Textc
                 color="base"
                 key="prev"
                 touchStyle={[calendarStyles.prev, calendarStyles.liMonth]}
                 style={{ fontSize: 20 }}
               >
                 &#10094;
-              </Textc>
+              </Textc> */}
+              <AntDesign name="leftcircle" size={24} color={base_color} />
             </TouchableOpacity>
           ) : null}
           <TouchableOpacity
@@ -115,14 +118,15 @@ export default function Calendar({
 
           {allowChangeMonth ? (
             <TouchableOpacity onPress={() => nextMonth()}>
-              <Textc
+              {/* <Textc
                 color="base"
                 key="next"
                 touchStyle={[calendarStyles.next, calendarStyles.liMonth]}
                 style={{ fontSize: 20 }}
               >
                 &#10095;
-              </Textc>
+              </Textc> */}
+              <AntDesign name="rightcircle" size={24} color={base_color} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -212,7 +216,7 @@ export default function Calendar({
                       key={"d" + i}
                       style={[
                         `${day}-${month}-${year}` ===
-                        `${e.day}-${calendar.options.monthIndex}-${calendar.options.year}`
+                        `${e.day}-${e.monthIndex}-${e.year}`
                           ? calendarStyles.active
                           : {},
                         e.className.includes("month-day")
@@ -283,7 +287,7 @@ export default function Calendar({
                     style={[
                       calendarStyles.li,
                       `${day}-${month}-${year}` ===
-                      `${e.day}-${calendar.options.monthIndex}-${calendar.options.year}`
+                      `${e.day}-${e.monthIndex}-${e.year}`
                         ? calendarStyles.active
                         : {},
                       e.className.includes("month-day")

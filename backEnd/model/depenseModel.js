@@ -1,19 +1,19 @@
 import Sequelize from "rn-sequelize";
 import { sequelize } from "../options";
 
-export const BudgetGlobal = sequelize.define("BudgetGlobal", {
+export const Depense = sequelize.define("Depense", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     primaryKey: true,
   },
-  dateDebut: {
+  date: {
     type: Sequelize.STRING,
   },
-  dateFin: {
+  comment: {
     type: Sequelize.STRING,
   },
-  budget: {
+  montant: {
     type: Sequelize.FLOAT,
   },
 });

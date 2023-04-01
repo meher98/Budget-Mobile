@@ -24,7 +24,6 @@ export default function Modalc({ show, closeFunction, children }) {
   }, []);
   return (
     <Modal visible={show} animationType="slide" transparent={true}>
-      <StatusBar backgroundColor="white" style="light" />
       <View
         style={[
           isSmallScreen ? modalStyles.modalContainerSmallScreen : null,

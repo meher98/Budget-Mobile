@@ -1,17 +1,37 @@
 import { Dimensions, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { tableStyles } from "../styles/table";
 import Textc from "./Textc";
 
-const Table = ({ headers, content, parentWidth }) => {
+const Table = ({ headers, content, parentWidth, nbIcons, toIgnore }) => {
+  const [filtredContent, setFiltredContent] = useState([]);
+  useEffect(() => {
+    let tab = content.map((el) => {
+      let filtredEl = {};
+      for (let key of Object.keys(el)) {
+        if (!toIgnore?.includes(key)) {
+          filtredEl[key] = el[key];
+        }
+      }
+      return filtredEl;
+    });
+    setFiltredContent([...tab]);
+  }, [content]);
+
   const transpose = (arr) => {
     return arr[0].map((_, i) => arr.map((row) => row[i]));
   };
   const max = (tab) => {
     let m = 0;
-    for (el of tab) {
-      if (el?.length > m) {
-        m = el.length;
+    for (let el of tab) {
+      if (el === "[object Object]") {
+        if (3 * nbIcons > m) {
+          m = 3.5 * nbIcons;
+        }
+      } else {
+        if (el?.length > m) {
+          m = el.length;
+        }
       }
     }
     return m;
@@ -24,7 +44,7 @@ const Table = ({ headers, content, parentWidth }) => {
   };
   const trans = transpose([
     headers,
-    ...content.map((el, i) => Object.values(el).map((e) => e.toString())),
+    ...filtredContent.map((el) => Object.values(el).map((e) => e.toString())),
   ]);
   const maxTab = trans.map((el) => max(el));
   return (
@@ -37,7 +57,7 @@ const Table = ({ headers, content, parentWidth }) => {
               style={[
                 tableStyles.header,
                 {
-                  width: (parentWidth * maxTab[i]) / somme(maxTab),
+                  width: ((parentWidth - 10) * maxTab[i]) / somme(maxTab),
                 },
               ]}
               key={i}
@@ -46,47 +66,58 @@ const Table = ({ headers, content, parentWidth }) => {
             </Textc>
           ))}
         </View>
-        {content.map((row, i) => (
-          <View
-            style={
-              i === content.length - 1 ? tableStyles.lastRow : tableStyles.row
-            }
-            key={i}
-          >
-            {Object.values(row).map((cell, j) =>
-              typeof cell !== "object" ? (
-                <Textc
-                  style={[
-                    tableStyles.cell,
-                    {
-                      width: (parentWidth * maxTab[j]) / somme(maxTab),
-                    },
-                  ]}
-                  key={j}
-                >
-                  {cell}
-                </Textc>
-              ) : (
-                <View
-                  style={[
-                    tableStyles.cell,
-                    {
-                      width: ((parentWidth - 12) * maxTab[j]) / somme(maxTab),
-                    },
-                  ]}
-                  key={j}
-                >
-                  {cell}
-                </View>
-              )
-            )}
+        {filtredContent.length === 0 ? (
+          <View style={tableStyles.videText}>
+            <Textc>Tableau vide</Textc>
           </View>
-        ))}
+        ) : (
+          filtredContent.map((row, i) => (
+            <View
+              style={
+                i === filtredContent.length - 1
+                  ? tableStyles.lastRow
+                  : tableStyles.row
+              }
+              key={i}
+            >
+              {Object.values(row).map((cell, j) =>
+                typeof cell !== "object" ? (
+                  <Textc
+                    style={[
+                      tableStyles.cell,
+                      {
+                        width: ((parentWidth - 10) * maxTab[j]) / somme(maxTab),
+                      },
+                    ]}
+                    key={j}
+                  >
+                    {cell}
+                  </Textc>
+                ) : (
+                  <View
+                    style={[
+                      tableStyles.cell,
+                      {
+                        width: ((parentWidth - 10) * maxTab[j]) / somme(maxTab),
+                      },
+                    ]}
+                    key={j}
+                  >
+                    {cell}
+                  </View>
+                )
+              )}
+            </View>
+          ))
+        )}
       </View>
     </View>
   );
 };
 Table.defaultProps = {
   parentWidth: Dimensions.get("window").width - 40,
+  nbIcons: 0,
+  content: [],
+  toIgnore: [],
 };
 export default Table;

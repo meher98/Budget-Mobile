@@ -6,12 +6,18 @@ import Table from "./components/Table";
 import Calendrier from "./pages/Calendrier";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Test from "./pages/Test";
 import Jour from "./pages/Jour";
 import { DateContext } from "./utils/functions";
+import Budgetisation from "./pages/Budgetisation";
+import { sequelize } from "./backEnd/options";
 
 export default function App() {
+  useEffect(() => {
+    sequelize.sync();
+  }, []);
+
   const Stack = createNativeStackNavigator();
   const week = ["Date", "Dépenses", "Budget", "Reste", "Réintégré", "Épargné"];
   const content = [
@@ -49,13 +55,15 @@ export default function App() {
   };
   const [date, setDate] = useState("");
   const [type, setType] = useState("");
+  const [currentRoute, setCurrentRoute] = useState("");
 
   return (
-    <DateContext.Provider value={[date, setDate, type, setType]}>
+    <DateContext.Provider
+      value={[date, setDate, type, setType, currentRoute, setCurrentRoute]}
+    >
       <NavigationContainer theme={navTheme}>
         <StatusBar style="light" />
         <Sidebar>
-          {/* <Calendrier /> */}
           <Stack.Navigator initialRouteName="Home">
             <Stack.Screen
               options={{
@@ -66,6 +74,26 @@ export default function App() {
               }}
               name="Home"
               component={Test}
+            />
+            <Stack.Screen
+              options={{
+                headerShown: false,
+                cardStyle: {
+                  backgroundColor: "transparent",
+                },
+              }}
+              name="Calendrier"
+              component={Calendrier}
+            />
+            <Stack.Screen
+              options={{
+                headerShown: false,
+                cardStyle: {
+                  backgroundColor: "transparent",
+                },
+              }}
+              name="Budgetisation"
+              component={Budgetisation}
             />
             <Stack.Screen
               options={{

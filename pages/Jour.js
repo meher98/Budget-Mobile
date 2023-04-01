@@ -11,7 +11,7 @@ import Table from "../components/Table";
 import jourStyles from "../styles/jour";
 import { capitalise, DateContext, evaluate } from "../utils/functions";
 import ConfirmModal from "../components/ConfirmModal";
-import CircleButton from "../components/CirlcleButton";
+import CircleButton from "../components/CircleButton";
 import {
   Text,
   TouchableOpacity,
@@ -449,7 +449,12 @@ export default function Jour() {
         </LinearGradient>
       </View>
       <Card>
-        <Table headers={week} content={content} mobile={["Commentaire"]} />
+        <Table
+          nbIcons={2}
+          headers={week}
+          content={content}
+          mobile={["Commentaire"]}
+        />
       </Card>
 
       <Modalc show={show[0]} closeFunction={() => generalModalClose(0)}>

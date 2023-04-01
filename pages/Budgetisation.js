@@ -1,21 +1,47 @@
 import { useFormik } from "formik";
 import { evaluate } from "mathjs";
 import React, { useEffect, useState } from "react";
-import { BsFillPencilFill, BsPlus } from "react-icons/bs";
 import Card from "../components/Card";
 import Table from "../components/Table";
 import * as yup from "yup";
 import Input from "../components/Input";
-import Modal from "../components/Modal";
+import Modalc from "../components/Modal";
 import { timeToDate, dateDiffrence, dateToTime } from "../utils/functions";
-import { FaTrash } from "react-icons/fa";
+import { globalStyles } from "../styles/global";
+import { ScrollView, TouchableOpacity, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import RoundButton from "../components/RoundButton";
+import CircleButton from "../components/CircleButton";
+import { modalStyles } from "../styles/modal";
+import jourStyles from "../styles/jour";
+import {
+  base_color,
+  base_color_deg,
+  fontSize,
+  fourth_color,
+} from "../styles/vars";
+import { deg } from "react-native-linear-gradient-degree";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import Textc from "../components/Textc";
+import confirmModalStyles from "../styles/confirmModal";
+import {
+  addBudgetGlobal,
+  getAllBudgetGlobal,
+} from "../backEnd/dao/budgetGlobalDao";
 
 export default function Budgetisation() {
   const [content, setContent] = useState([]);
   const [show, setShow] = useState([false, false]);
   const [maxD, setMaxD] = useState("01/01/2000");
   useEffect(() => {
-    setMaxD(timeToDate(Math.max(...content.map((o) => dateToTime(o.dateF)))));
+    getAllBudgetGlobal()
+      .then((data) => {
+        setContent([...data.map((el) => addMofifierBtn(el))]);
+      })
+      .catch((e) => {});
+  }, []);
+  useEffect(() => {
+    setMaxD(timeToDate(Math.max(...content.map((o) => dateToTime(o.dateFin)))));
   }, [content]);
 
   const addToContent = (el) => {
@@ -23,17 +49,41 @@ export default function Budgetisation() {
     x.push(el);
     setContent([...x]);
   };
+
+  const addMofifierBtn = (el) => {
+    let v = el;
+    v["modifier"] = (
+      <View style={jourStyles.actionsContainer}>
+        <TouchableOpacity
+          onPress={() =>
+            generalModalOpen(1, {
+              budget: v.budget,
+              dateDebut: v.dateDebut,
+              dateFin: v.dateFin,
+            })
+          }
+        >
+          <MaterialCommunityIcons
+            name="pencil"
+            size={fontSize * 1.2}
+            color={fourth_color}
+          />
+        </TouchableOpacity>
+      </View>
+    );
+    return v;
+  };
   const depenseSchema = yup.object({
     budget: yup.string().required("Ce champ est obligatoire"),
     commentaire: yup.string().max(20, "Commentaire trop long"),
-    dateD: yup.string().required("Ce champ est obligatoire"),
-    dateF: yup.string().required("Ce champ est obligatoire"),
+    dateDebut: yup.string().required("Ce champ est obligatoire"),
+    dateFin: yup.string().required("Ce champ est obligatoire"),
   });
   const addFormik = useFormik({
     initialValues: {
       budget: "",
-      dateD: "",
-      dateF: "",
+      dateDebut: "",
+      dateFin: "",
     },
     validateOnChange: false,
     validationSchema: depenseSchema,
@@ -53,44 +103,33 @@ export default function Budgetisation() {
           errors.budget = "Veillez saisir un nombre ou une equation valide";
         }
       }
-      if (dateDiffrence(values.dateD, values.dateF) < 0) {
-        errors.dateF = "La date de fin doit être après la date de début";
+      if (dateDiffrence(values.dateDebut, values.dateFin) < 0) {
+        errors.dateFin = "La date de fin doit être après la date de début";
       }
-      if (dateDiffrence(maxD, values.dateD) < 0) {
-        errors.dateD = "La date de fin doit être ultérieur à " + maxD;
+      if (dateDiffrence(maxD, values.dateDebut) < 0) {
+        errors.dateDebut = "La date de fin doit être ultérieur à " + maxD;
       }
       return errors;
     },
     onSubmit: (values) => {
-      let v = values;
-      v.jours = dateDiffrence(values.dateD, values.dateF);
-      v["modifier"] = (
-        <div className="actions-container">
-          <span
-            onClick={() =>
-              generalModalOpen(1, {
-                budget: v.budget,
-                dateD: v.dateD,
-                dateF: v.dateF,
-              })
-            }
-          >
-            <BsFillPencilFill />
-          </span>
-          <span>
-            <FaTrash />
-          </span>
-        </div>
-      );
-      addToContent(v);
+      addBudgetGlobal(values)
+        .then((val) => {
+          console.log(val);
+          let v = addMofifierBtn(val);
+          addToContent(v);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+
       generalModalClose(0);
     },
   });
   const editFormik = useFormik({
     initialValues: {
       budget: "",
-      dateD: "",
-      dateF: "",
+      dateDebut: "",
+      dateFin: "",
     },
     validateOnChange: false,
     validationSchema: depenseSchema,
@@ -110,11 +149,11 @@ export default function Budgetisation() {
           errors.budget = "Veillez saisir un nombre ou une equation valide";
         }
       }
-      if (dateDiffrence(values.dateD, values.dateF) < 0) {
-        errors.dateF = "La date de fin doit être après la date de début";
+      if (dateDiffrence(values.dateDebut, values.dateFin) < 0) {
+        errors.dateFin = "La date de fin doit être après la date de début";
       }
-      if (dateDiffrence(maxD, values.dateD) < 0) {
-        errors.dateD = "La date de fin doit être ultérieur à " + maxD;
+      if (dateDiffrence(maxD, values.dateDebut) < 0) {
+        errors.dateDebut = "La date de fin doit être ultérieur à " + maxD;
       }
       return errors;
     },
@@ -136,103 +175,137 @@ export default function Budgetisation() {
     x[i] = true;
     if (obj) {
       for (let el of Object.keys(obj)) {
-        formik[i].setFieldValue(el, obj[el]);
+        formik[i].setFieldValue(el, obj[el].toString());
       }
     }
     setShow([...x]);
   };
   return (
-    <div className="jour-container">
-      <div className="Add-button-container">
-        <div className="circle-btn" onClick={() => generalModalOpen(0)}>
-          <BsPlus />
-        </div>
-      </div>
+    <ScrollView style={globalStyles.pageContainer}>
+      <View style={jourStyles.addButtonContainer}>
+        <LinearGradient
+          colors={[base_color, base_color_deg]}
+          style={[globalStyles.gradientCircleBtn, jourStyles.circleBtn]}
+          {...deg(45)}
+        >
+          <CircleButton
+            onPress={() => generalModalOpen(0)}
+            title={
+              <FontAwesome5
+                name="plus"
+                size={fontSize * 1.5}
+                color={fourth_color}
+              />
+            }
+          />
+        </LinearGradient>
+      </View>
       <Card>
         <Table
-          headers={["Budget", "Début", "Fin", "Jours", "Modifier"]}
+          headers={["Budget", "Début", "Fin", "Modifier"]}
           content={content}
-          mobile={["Jours"]}
+          toIgnore={["id"]}
+          nbIcons={1}
         />
       </Card>
-      <Modal show={show[0]} closeFunction={() => generalModalClose(0)}>
-        <div className="depense-modal">
-          <h1>Tu as encore depensé !</h1>
-          <form onSubmit={addFormik.handleSubmit}>
+      <Modalc show={show[0]} closeFunction={() => generalModalClose(0)}>
+        <View className="depense-modal">
+          <Textc color="fourth" style={confirmModalStyles.h1}>
+            Tu as encore depensé !
+          </Textc>
+          <View style={"form"}>
             <Input
+              color={fourth_color}
               type="number"
-              onChange={addFormik.handleChange}
+              onChange={(e) => addFormik.setFieldValue("budget", e)}
               value={addFormik.values.budget}
-              id="budget"
-              placeholder="budget"
+              placeholder="Budget"
               error={addFormik.errors?.budget}
             />
             <Input
+              color={fourth_color}
               type="mois"
-              onChange={(e) => addFormik.setFieldValue("dateD", e)}
-              value={addFormik.values.dateD}
-              id="dateD"
+              onChange={(e) => addFormik.setFieldValue("dateDebut", e)}
+              value={addFormik.values.dateDebut}
               placeholder="Date de début"
-              error={addFormik.errors?.dateD}
+              error={addFormik.errors?.dateDebut}
               allowChangeMonth
             />
             <Input
+              color={fourth_color}
               type="mois"
-              onChange={(e) => addFormik.setFieldValue("dateF", e)}
-              value={addFormik.values.dateF}
-              id="dateF"
+              onChange={(e) => addFormik.setFieldValue("dateFin", e)}
+              value={addFormik.values.dateFin}
               placeholder="Date de fin"
-              error={addFormik.errors?.dateF}
+              error={addFormik.errors?.dateFin}
               allowChangeMonth
             />
-            <div className="modal-btn-container">
-              <button className="round-btn">Confirmer</button>
-              <div onClick={() => generalModalClose(0)} className="round-btn">
-                Annuler
-              </div>
-            </div>
-          </form>
-        </div>
-      </Modal>
-      <Modal show={show[1]} closeFunction={() => generalModalClose(1)}>
-        <div className="depense-modal">
-          <h1>Tu as encore depensé !</h1>
-          <form onSubmit={editFormik.handleSubmit}>
+            <View style={modalStyles.modalBtnContainer}>
+              <RoundButton
+                btnStyle={modalStyles.roundBtn}
+                textStyle={modalStyles.roundBtnText}
+                onPress={addFormik.handleSubmit}
+                title="Confirmer"
+              />
+              <RoundButton
+                btnStyle={modalStyles.roundBtn}
+                textStyle={modalStyles.roundBtnText}
+                onPress={() => generalModalClose(0)}
+                title="Annuler"
+              />
+            </View>
+          </View>
+        </View>
+      </Modalc>
+      <Modalc show={show[1]} closeFunction={() => generalModalClose(1)}>
+        <View className="depense-modal">
+          <Textc color="fourth" style={confirmModalStyles.h1}>
+            Tu as encore depensé !
+          </Textc>
+          <View style={"form"}>
             <Input
+              color={fourth_color}
               type="number"
-              onChange={editFormik.handleChange}
+              onChange={(e) => editFormik.setFieldValue("budget", e)}
               value={editFormik.values.budget}
-              id="budget"
-              placeholder="budget"
+              placeholder="Budget"
               error={editFormik.errors?.budget}
             />
             <Input
+              color={fourth_color}
               type="mois"
-              onChange={(e) => editFormik.setFieldValue("dateD", e)}
-              value={editFormik.values.dateD}
-              id="dateD"
+              onChange={(e) => editFormik.setFieldValue("dateDebut", e)}
+              value={editFormik.values.dateDebut}
               placeholder="Date de début"
-              error={editFormik.errors?.dateD}
+              error={editFormik.errors?.dateDebut}
               allowChangeMonth
             />
             <Input
+              color={fourth_color}
               type="mois"
-              onChange={(e) => editFormik.setFieldValue("dateF", e)}
-              value={editFormik.values.dateF}
-              id="dateF"
+              onChange={(e) => editFormik.setFieldValue("dateFin", e)}
+              value={editFormik.values.dateFin}
               placeholder="Date de fin"
-              error={editFormik.errors?.dateF}
+              error={editFormik.errors?.dateFin}
               allowChangeMonth
             />
-            <div className="modal-btn-container">
-              <button className="round-btn">Confirmer</button>
-              <div onClick={() => generalModalClose(1)} className="round-btn">
-                Annuler
-              </div>
-            </div>
-          </form>
-        </div>
-      </Modal>
-    </div>
+            <View style={modalStyles.modalBtnContainer}>
+              <RoundButton
+                btnStyle={modalStyles.roundBtn}
+                textStyle={modalStyles.roundBtnText}
+                onPress={editFormik.handleSubmit}
+                title="Confirmer"
+              />
+              <RoundButton
+                btnStyle={modalStyles.roundBtn}
+                textStyle={modalStyles.roundBtnText}
+                onPress={() => generalModalClose(1)}
+                title="Annuler"
+              />
+            </View>
+          </View>
+        </View>
+      </Modalc>
+    </ScrollView>
   );
 }

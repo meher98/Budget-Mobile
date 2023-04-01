@@ -42,4 +42,11 @@ export const tableStyles = StyleSheet.create({
     padding: 5,
     textAlign: "center",
   },
+  videText: {
+    width: "100%",
+    flexDirection: "column",
+    alignItems: "center",
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
 });

@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 
-const CirlcleButton = ({ onPress, title, textStyle, btnStyle }) => {
+const CircleButton = ({ onPress, title, textStyle, btnStyle }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -22,4 +22,4 @@ const CirlcleButton = ({ onPress, title, textStyle, btnStyle }) => {
     </TouchableOpacity>
   );
 };
-export default CirlcleButton;
+export default CircleButton;
