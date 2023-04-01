@@ -114,7 +114,6 @@ export default function Budgetisation() {
     onSubmit: (values) => {
       addBudgetGlobal(values)
         .then((val) => {
-          console.log(val);
           let v = addMofifierBtn(val);
           addToContent(v);
         })

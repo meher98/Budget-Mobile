@@ -44,7 +44,7 @@ export const getWeekFromDate = (y, m, d) => {
     })
   );
   let week = weekParams(y, m, indexW, weeks[indexW]);
-  return `${week[0]}-${week[1]}-${week[2]}`;
+  return `${twoDigits(week[0])}-${twoDigits(week[1])}-${twoDigits(week[2])}`;
 };
 export const stopScrolling = () => {
   // To get the scroll position of current webpage
@@ -86,3 +86,30 @@ export const timeToDate = (t) => {
   })}/${d.getFullYear()}`;
 };
 export const DateContext = createContext();
+
+export const usFormatDate = (date) => {
+  let dateTab = date.split("/");
+  dateTab = dateTab.reverse();
+  return dateTab.join("-");
+};
+export const twoDigits = (e) => (e.toString().length > 1 ? e : "0" + e);
+export const getDatesInRange = (dateD, dateF) => {
+  const startDate = new Date(usFormatDate(dateD));
+  const endDate = new Date(usFormatDate(dateF));
+  const date = new Date(startDate.getTime());
+  date.setDate(date.getDate());
+
+  const dates = [];
+
+  while (date <= endDate) {
+    let newDate = new Date(date);
+    dates.push(
+      `${twoDigits(newDate.getDate())}/${twoDigits(newDate.getMonth() + 1)}/${
+        newDate.getYear() + 1900
+      }`
+    );
+    date.setDate(date.getDate() + 1);
+  }
+
+  return dates;
+};

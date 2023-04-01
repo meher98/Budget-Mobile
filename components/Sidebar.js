@@ -252,7 +252,7 @@ export default function Sidebar(props) {
                 sidebarStyles.sidebarItem,
                 (navigation?.getCurrentRoute()?.name === "depenses" ||
                   currentRoute === "depenses") &&
-                pageDate === `${year}-${month}-${day}` &&
+                pageDate === `${year}-${twoDigits(month)}-${twoDigits(day)}` &&
                 type === "jour"
                   ? sidebarStyles.active
                   : {},
@@ -261,7 +261,7 @@ export default function Sidebar(props) {
                 setCurrentRoute("depenses");
                 navigation.navigate("depenses", {
                   type: "jour",
-                  date: `${year}-${month}-${day}`,
+                  date: `${year}-${twoDigits(month)}-${twoDigits(day)}`,
                 });
               }}
             >
@@ -271,7 +271,8 @@ export default function Sidebar(props) {
                 color={
                   (navigation?.getCurrentRoute()?.name === "depenses" ||
                     currentRoute === "depenses") &&
-                  pageDate === `${year}-${month}-${day}` &&
+                  pageDate ===
+                    `${year}-${twoDigits(month)}-${twoDigits(day)}` &&
                   type === "jour"
                     ? base_color
                     : fourth_color
@@ -281,7 +282,8 @@ export default function Sidebar(props) {
                 color={
                   (navigation?.getCurrentRoute()?.name === "depenses" ||
                     currentRoute === "depenses") &&
-                  pageDate === `${year}-${month}-${day}` &&
+                  pageDate ===
+                    `${year}-${twoDigits(month)}-${twoDigits(day)}` &&
                   type === "jour"
                     ? "base"
                     : "fourth"
@@ -340,7 +342,7 @@ export default function Sidebar(props) {
                 sidebarStyles.sidebarItem,
                 (navigation?.getCurrentRoute()?.name === "depenses" ||
                   currentRoute === "depenses") &&
-                pageDate === `${year}-${month}` &&
+                pageDate === `${year}-${twoDigits(month)}` &&
                 type === "mois"
                   ? sidebarStyles.active
                   : {},
@@ -349,7 +351,7 @@ export default function Sidebar(props) {
                 setCurrentRoute("depenses");
                 navigation.navigate("depenses", {
                   type: "mois",
-                  date: `${year}-${month}`,
+                  date: `${year}-${twoDigits(month)}`,
                 });
               }}
             >
@@ -359,7 +361,7 @@ export default function Sidebar(props) {
                 color={
                   (navigation?.getCurrentRoute()?.name === "depenses" ||
                     currentRoute === "depenses") &&
-                  pageDate === `${year}-${month}` &&
+                  pageDate === `${year}-${twoDigits(month)}` &&
                   type === "mois"
                     ? base_color
                     : fourth_color
@@ -369,7 +371,7 @@ export default function Sidebar(props) {
                 color={
                   (navigation?.getCurrentRoute()?.name === "depenses" ||
                     currentRoute === "depenses") &&
-                  pageDate === `${year}-${month}` &&
+                  pageDate === `${year}-${twoDigits(month)}` &&
                   type === "mois"
                     ? "base"
                     : "fourth"
@@ -437,9 +439,9 @@ export default function Sidebar(props) {
 //           </div>
 //           <div
 //             className={`sidebar-item ${
-//               href === `/depenses/jour/${year}-${month}-${day}` ? "active" : ""
+//               href === `/depenses/jour/${year}-${twoDigits(month)}-${twoDigits(day)}` ? "active" : ""
 //             }`}
-//             onClick={() => navigate(`/depenses/jour/${year}-${month}-${day}`)}
+//             onClick={() => navigate(`/depenses/jour/${year}-${twoDigits(month)}-${twoDigits(day)}`)}
 //           >
 //             <BsFillBagFill />
 //             <p className="gradient-textcTextc">Aujourd'hui</p>
@@ -459,9 +461,9 @@ export default function Sidebar(props) {
 //           </div>
 //           <div
 //             className={`sidebar-item ${
-//               href === `/depenses/mois/${year}-${month}` ? "active" : ""
+//               href === `/depenses/mois/${year}-${twoDigits(month)}` ? "active" : ""
 //             }`}
-//             onClick={() => navigate(`/depenses/mois/${year}-${month}`)}
+//             onClick={() => navigate(`/depenses/mois/${year}-${twoDigits(month)}`)}
 //           >
 //             <BsFillCartFill />
 //             <p className="gradient-textcTextc">Ce mois</p>

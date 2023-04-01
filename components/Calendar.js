@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { calendarStyles } from "../styles/calendar";
-import { verifWeekInMonth, weekParams } from "../utils/functions";
+import { twoDigits, verifWeekInMonth, weekParams } from "../utils/functions";
 import { AntDesign } from "@expo/vector-icons";
 import Grid from "./Grid";
 import Textc from "./Textc";
@@ -208,7 +208,11 @@ export default function Calendar({
                     onPress={() =>
                       dayClick
                         ? (otherMonths || e.className.includes("month-day")) &&
-                          dayClick(e.year, e.monthIndex + 1, e.day)
+                          dayClick(
+                            e.year,
+                            twoDigits(e.monthIndex + 1),
+                            twoDigits(e.day)
+                          )
                         : null
                     }
                   >
@@ -278,7 +282,11 @@ export default function Calendar({
                   onPress={() =>
                     dayClick
                       ? (otherMonths || e.className.includes("month-day")) &&
-                        dayClick(e.year, e.monthIndex + 1, e.day)
+                        dayClick(
+                          e.year,
+                          twoDigits(e.monthIndex + 1),
+                          twoDigits(e.day)
+                        )
                       : null
                   }
                 >
