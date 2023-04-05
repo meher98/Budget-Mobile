@@ -1,13 +1,12 @@
 import Sequelize from "rn-sequelize";
 import { sequelize } from "../options";
-import BudgetGlobal from "./budgetGlobalModel";
 
-export const Budget = sequelize.define("Budget", {
+export const Budget = sequelize.define("Budgets", {
   idBudgetGlobal: {
     type: Sequelize.INTEGER,
     primaryKey: true,
     references: {
-      model: BudgetGlobal,
+      model: "BudgetGlobals",
       key: "id",
     },
   },
@@ -15,8 +14,10 @@ export const Budget = sequelize.define("Budget", {
     type: Sequelize.STRING,
     primaryKey: true,
   },
-
-  montant: {
+  budget: {
+    type: Sequelize.FLOAT,
+  },
+  reste: {
     type: Sequelize.FLOAT,
   },
 });

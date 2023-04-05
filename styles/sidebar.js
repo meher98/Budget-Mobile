@@ -1,20 +1,27 @@
-import { base_color, fourth_color, third_color } from "./vars";
+import { base_color, fontSize, transparent_color } from "./vars";
 import { StyleSheet, Dimensions } from "react-native";
+import { NativeModules } from "react-native";
+
+const { StatusBarManager } = NativeModules;
 
 export const sidebarStyles = StyleSheet.create({
   sidebarGlobalContainer: {
     minHeight: "100%",
-  },
-  active: {
-    backgroundColor: fourth_color,
+    backgroundColor: base_color,
   },
   sidebarContainer: {
-    backgroundColor: base_color,
-    height: "100%",
-    width: "80%",
-    position: "absolute",
-    transform: [{ translateX: -Dimensions.get("window").width * 0.8 - 10 }],
+    backgroundColor: transparent_color,
     zIndex: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+    width: Dimensions.get("window").width,
+    height: 60,
+    borderTopWidth: 0.2,
+    borderColor: transparent_color,
+    paddingVertical: 5,
   },
   openCloseBtn: {
     position: "absolute",
@@ -25,111 +32,31 @@ export const sidebarStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     fontSize: 25,
-    // transition: transform calc($transitiontime * 3), marginleft $transitiontime,
-    // transform: rotate(180deg),
   },
   openCloseBtnOpen: {
-    // transform: rotate(0),
     left: 300,
-  },
-  sidebarFilter: {
-    display: "none",
-  },
-  sidebarLogo: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: (Dimensions.get("window").height * 5) / 100,
-    padding: 10,
-  },
-  img: {
-    // height: 0,
-    width: 180,
-    height: 180,
-    // height: 200,
   },
   sidebarBody: {
     flexDirection: "column",
-    paddingTop: 20,
-    paddingBottom: 20,
+    justifyContent: "center",
+    alignItems: "center",
   },
   sidebarItem: {
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
-    paddingTop: 20,
-    paddingBottom: 20,
-    paddingLeft: 30,
-    paddingRight: 30,
-    // &:hover,
-    // &active: {
-    //     background: lineargradient(45deg, $thirdcolor 0%, $secondcolor 100%),
-    //     color: $basecolor,
-
-    // },
+    justifyContent: "center",
+    width: 50,
+    height: 50,
   },
   gradientText: {
-    marginLeft: 10,
-    fontSize: 20,
+    fontSize: 0.5 * fontSize,
+    textAlign: "center",
   },
   sidebarPageContainer: {
-    paddingTop: (Dimensions.get("window").height * 6) / 100,
-    // paddingBottom: 70,
+    paddingTop: StatusBarManager.HEIGHT + 10,
     paddingLeft: 10,
     paddingRight: 10,
-    // transition: all $transitiontime,
     width: "100%",
-    minHeight: "100%",
-    marginLeft: 0,
-    // &open: {
-    //     width: calc("100%" - 300),
-    //     marginleft: 300,
-    // },
-  },
-  sidebarFilter: {
-    height: "100%",
-    width: "100%",
-    position: "absolute",
-    backgroundColor: "rgba(0,0,0,0.7)",
-    zIndex: 1,
-    // &open: {
-    //     display: block,
-    // },
+    minHeight: Dimensions.get("window").height + StatusBarManager.HEIGHT - 60,
   },
 });
-// @media (maxwidth: 850): {
-//     sidebarpagecontainer: {
-//         padding: 70 10,
-//         &open: {
-//             width: "100%",
-//             marginleft: 0,
-//         },
-//     },
-
-//     openclosebtn: {
-//         left: 7,
-//         color: $basecolor,
-//         &open: {
-//             color: $secondcolor,
-//         },
-//     },
-//     sidebarfilter: {
-//         display: none,
-//         height: "100%",
-//         width: "100%",
-//         position: fixed,
-//         backgroundcolor: rgba($color: black, $alpha: 07),
-//         &open: {
-//             display: block,
-//         },
-//     },
-// }})
-// @media (maxwidth: 375): {
-//     openclosebtn: {
-//         &open: {
-//             marginleft: 80%,
-//         },
-//     },
-//     sidebarcontainer: {
-//         width: 80%,
-//     },
-// },

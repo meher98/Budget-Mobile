@@ -10,7 +10,6 @@ import { AntDesign } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import Card from "./Card.js";
 import { fourth_color } from "../styles/vars.js";
-import { StatusBar } from "expo-status-bar";
 
 export default function Modalc({ show, closeFunction, children }) {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -23,7 +22,12 @@ export default function Modalc({ show, closeFunction, children }) {
     }
   }, []);
   return (
-    <Modal visible={show} animationType="slide" transparent={true}>
+    <Modal
+      visible={show}
+      animationType="slide"
+      transparent
+      statusBarTranslucent
+    >
       <View
         style={[
           isSmallScreen ? modalStyles.modalContainerSmallScreen : null,
@@ -36,7 +40,7 @@ export default function Modalc({ show, closeFunction, children }) {
           <View style={modalStyles.openModalFilter}></View>
         </TouchableWithoutFeedback>
         <View style={modalStyles.cardContainer}>
-          <Card gradientStyle={modalStyles.modalCard}>
+          <Card style={modalStyles.modalCard}>
             <TouchableOpacity
               style={modalStyles.modalCloseBtn}
               onPress={closeFunction ? closeFunction : null}

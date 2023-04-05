@@ -9,18 +9,11 @@ import Modalc from "../components/Modal";
 import { timeToDate, dateDiffrence, dateToTime } from "../utils/functions";
 import { globalStyles } from "../styles/global";
 import { ScrollView, TouchableOpacity, View } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import RoundButton from "../components/RoundButton";
 import CircleButton from "../components/CircleButton";
 import { modalStyles } from "../styles/modal";
 import jourStyles from "../styles/jour";
-import {
-  base_color,
-  base_color_deg,
-  fontSize,
-  fourth_color,
-} from "../styles/vars";
-import { deg } from "react-native-linear-gradient-degree";
+import { fontSize, fourth_color } from "../styles/vars";
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import Textc from "../components/Textc";
 import confirmModalStyles from "../styles/confirmModal";
@@ -112,7 +105,9 @@ export default function Budgetisation() {
       return errors;
     },
     onSubmit: (values) => {
-      addBudgetGlobal(values)
+      let vals = values;
+      vals.reste = values.budget;
+      addBudgetGlobal(vals)
         .then((val) => {
           let v = addMofifierBtn(val);
           addToContent(v);
@@ -182,29 +177,25 @@ export default function Budgetisation() {
   return (
     <ScrollView style={globalStyles.pageContainer}>
       <View style={jourStyles.addButtonContainer}>
-        <LinearGradient
-          colors={[base_color, base_color_deg]}
-          style={[globalStyles.gradientCircleBtn, jourStyles.circleBtn]}
-          {...deg(45)}
-        >
-          <CircleButton
-            onPress={() => generalModalOpen(0)}
-            title={
-              <FontAwesome5
-                name="plus"
-                size={fontSize * 1.5}
-                color={fourth_color}
-              />
-            }
-          />
-        </LinearGradient>
+        <CircleButton
+          btnStyle={jourStyles.circleBtn}
+          onPress={() => generalModalOpen(0)}
+          title={
+            <FontAwesome5
+              name="plus"
+              size={fontSize * 1.5}
+              color={fourth_color}
+            />
+          }
+        />
       </View>
       <Card>
         <Table
-          headers={["Budget", "Début", "Fin", "Modifier"]}
+          headers={["Budget", "Début", "Fin", "Reste", "Modifier"]}
           content={content}
           toIgnore={["id"]}
           nbIcons={1}
+          dateIndexTab={[1, 2]}
         />
       </Card>
       <Modalc show={show[0]} closeFunction={() => generalModalClose(0)}>

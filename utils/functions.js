@@ -3,7 +3,12 @@ import { createContext } from "react";
 const config = {};
 const mt = require("mathjs");
 const math = mt.create(mt.all, config);
-
+export const twoDigits = (e) => {
+  return e.toString().length > 1 ? e : "0" + e;
+};
+export const oneDigit = (e) => {
+  return e.length > 1 && e[1] === "0" ? e[0] : e;
+};
 export const verifWeekInMonth = (w) => {
   for (let e of w) {
     var b = false;
@@ -37,7 +42,6 @@ export const getWeekFromDate = (y, m, d) => {
   weeks.map((w, wi) =>
     // eslint-disable-next-line array-callback-return
     w.map((e) => {
-      console.log(weeks);
       if (e.day === d && e.monthIndex === m) {
         indexW = wi;
       }
@@ -62,8 +66,9 @@ export const returnScrolling = () => {
 export const capitalise = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 export const evaluate = (expression) => math.evaluate(expression);
 export const convertDate = (date) => {
-  let newDate = date.split("/");
-  return `${newDate[2]}/${newDate[1]}/${newDate[0]}`;
+  let dateTab = date.split("/");
+  dateTab = dateTab.reverse();
+  return dateTab.join("-");
 };
 export const dateDiffrence = (date10, date20) => {
   const date1 = new Date(convertDate(date10));
@@ -87,15 +92,9 @@ export const timeToDate = (t) => {
 };
 export const DateContext = createContext();
 
-export const usFormatDate = (date) => {
-  let dateTab = date.split("/");
-  dateTab = dateTab.reverse();
-  return dateTab.join("-");
-};
-export const twoDigits = (e) => (e.toString().length > 1 ? e : "0" + e);
 export const getDatesInRange = (dateD, dateF) => {
-  const startDate = new Date(usFormatDate(dateD));
-  const endDate = new Date(usFormatDate(dateF));
+  const startDate = new Date(convertDate(dateD));
+  const endDate = new Date(convertDate(dateF));
   const date = new Date(startDate.getTime());
   date.setDate(date.getDate());
 
@@ -110,6 +109,16 @@ export const getDatesInRange = (dateD, dateF) => {
     );
     date.setDate(date.getDate() + 1);
   }
-
   return dates;
+};
+export const dateDisplay = (date) => {
+  let newDate = "";
+  for (let i = 0; i < date.length; i++) {
+    if (i === 5) {
+      newDate += "\n";
+    } else {
+      newDate += date[i];
+    }
+  }
+  return newDate;
 };

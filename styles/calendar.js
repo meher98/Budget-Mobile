@@ -54,10 +54,10 @@ export const calendarStyles = StyleSheet.create({
     alignSelf: "center",
     textAlign: "center",
     fontSize: 0.87 * fontSize,
-    color: second_color,
+    color: fourth_color,
   },
   notInMonth: {
-    color: third_color,
+    color: fourth_color + "66",
   },
   weekday: {
     color: second_color,
@@ -66,12 +66,14 @@ export const calendarStyles = StyleSheet.create({
     marginBottom: 10,
   },
   week: {
-    color: fourth_color,
+    color: third_color,
   },
   active: {
     borderWidth: 1,
-    borderColor: second_color,
+    borderColor: fourth_color,
     borderRadius: 100,
+    backgroundColor: fourth_color,
+    color: base_color,
   },
 });
 // @media screen and (max-width: 500px): {

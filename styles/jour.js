@@ -1,5 +1,13 @@
 import { Dimensions, StyleSheet } from "react-native";
-import { base_color, fontSize, red } from "./vars";
+import {
+  base_color,
+  second_color,
+  fontSize,
+  fourth_color,
+  red,
+  third_color,
+  transparent_color,
+} from "./vars";
 
 const jourStyles = StyleSheet.create({
   jourContainer: {
@@ -50,15 +58,8 @@ const jourStyles = StyleSheet.create({
     flexDirection: "row",
   },
   circleBtn: {
+    backgroundColor: transparent_color,
     marginVertical: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
   depenseModal: {
     display: "flex",

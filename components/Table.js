@@ -2,8 +2,16 @@ import { Dimensions, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { tableStyles } from "../styles/table";
 import Textc from "./Textc";
+import { dateDisplay } from "../utils/functions";
 
-const Table = ({ headers, content, parentWidth, nbIcons, toIgnore }) => {
+const Table = ({
+  headers,
+  content,
+  parentWidth,
+  nbIcons,
+  toIgnore,
+  dateIndexTab,
+}) => {
   const [filtredContent, setFiltredContent] = useState([]);
   useEffect(() => {
     let tab = content.map((el) => {
@@ -29,8 +37,14 @@ const Table = ({ headers, content, parentWidth, nbIcons, toIgnore }) => {
           m = 3.5 * nbIcons;
         }
       } else {
-        if (el?.length > m) {
-          m = el.length;
+        if (dateIndexTab.includes(tab.indexOf(el))) {
+          if (5 > m) {
+            m = 5;
+          }
+        } else {
+          if (el?.length > m) {
+            m = el.length;
+          }
         }
       }
     }
@@ -91,7 +105,7 @@ const Table = ({ headers, content, parentWidth, nbIcons, toIgnore }) => {
                     ]}
                     key={j}
                   >
-                    {cell}
+                    {dateIndexTab.includes(j) ? dateDisplay(cell) : cell}
                   </Textc>
                 ) : (
                   <View
@@ -119,5 +133,6 @@ Table.defaultProps = {
   nbIcons: 0,
   content: [],
   toIgnore: [],
+  dateIndexTab: [],
 };
 export default Table;

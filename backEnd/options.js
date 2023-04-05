@@ -10,15 +10,3 @@ export const sequelize = new Sequelize({
     //size: 2 * 1024 * 1024
   },
 });
-
-export const testDB = async () => {
-  sequelize.sync();
-
-  User.findAll()
-    .then((data) => {
-      console.log(data);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};

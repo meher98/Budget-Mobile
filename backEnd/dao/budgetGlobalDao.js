@@ -1,4 +1,7 @@
+import { dateDiffrence, getDatesInRange } from "../../utils/functions";
 import { BudgetGlobal } from "../model/budgetGlobalModel";
+import { Budget } from "../model/budgetModel";
+import { sequelize } from "../options";
 
 export const getAllBudgetGlobal = () =>
   new Promise((resolve, reject) => {
@@ -12,6 +15,7 @@ export const getAllBudgetGlobal = () =>
             budget: el.dataValues.budget,
             dateDebut: el.dataValues.dateDebut,
             dateFin: el.dataValues.dateFin,
+            reste: el.dataValues.reste,
           };
         })
       );
@@ -21,15 +25,33 @@ export const getAllBudgetGlobal = () =>
   });
 export const addBudgetGlobal = async (values) =>
   new Promise(async (resolve, reject) => {
+    const t = await sequelize.transaction();
+    const budget = parseFloat(values.budget).toFixed(2);
+    const nbJours = dateDiffrence(values.dateDebut, values.dateFin) + 1;
+    const joursTab = getDatesInRange(values.dateDebut, values.dateFin);
     try {
-      var added = await BudgetGlobal.create(values);
+      const added = await BudgetGlobal.create(values, { transaction: t });
+      for (let jour of joursTab) {
+        let el = await Budget.create(
+          {
+            idBudgetGlobal: added.dataValues.id,
+            date: jour,
+            budget: budget / nbJours,
+            reste: budget / nbJours,
+          },
+          { transaction: t }
+        );
+      }
+      await t.commit();
       resolve({
         id: added.dataValues.id,
         budget: added.dataValues.budget,
         dateDebut: added.dataValues.dateDebut,
         dateFin: added.dataValues.dateFin,
+        reste: added.dataValues.reste,
       });
     } catch (e) {
+      await t.rollback();
       reject(e);
     }
   });

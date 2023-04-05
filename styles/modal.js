@@ -9,7 +9,7 @@ export const modalStyles = StyleSheet.create({
     height: "200%",
     width: "100%",
     backgroundColor: "rgba(0, 0, 0, 0.7)",
-    zIndex: 3,
+    zIndex: 1,
     display: "flex",
   },
   cardContainer: {
@@ -21,6 +21,7 @@ export const modalStyles = StyleSheet.create({
   },
   modalCard: {
     zIndex: 4,
+    backgroundColor: base_color + "BB",
   },
 
   openModalContainer: {

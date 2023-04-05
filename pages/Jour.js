@@ -20,17 +20,10 @@ import {
   Dimensions,
 } from "react-native";
 import RoundButton from "../components/RoundButton";
-import {
-  base_color,
-  base_color_deg,
-  fontSize,
-  fourth_color,
-} from "../styles/vars";
+import { fontSize, fourth_color } from "../styles/vars";
 import { globalStyles } from "../styles/global";
 import Textc from "../components/Textc";
 import Grid from "../components/Grid";
-import { LinearGradient } from "expo-linear-gradient";
-import { deg } from "react-native-linear-gradient-degree";
 import { modalStyles } from "../styles/modal";
 import confirmModalStyles from "../styles/confirmModal";
 
@@ -43,28 +36,13 @@ export default function Jour() {
   const { type, date } = useRoute().params;
   const dateType = useContext(DateContext);
   const [formatDate, setFormatDate] = useState(
-    `${parseInt(date.split("-")[2]).toLocaleString("en-US", {
-      minimumIntegerDigits: 2,
-      useGrouping: false,
-    })}/${parseInt(date.split("-")[1]).toLocaleString("en-US", {
-      minimumIntegerDigits: 2,
-      useGrouping: false,
-    })}/${date.split("-")[0]}`
+    `${date.split("-")[2]}/${date.split("-")[1]}/${date.split("-")[0]}`
   );
   useEffect(() => {
     setFormatDate(
       type === "mois"
-        ? `${parseInt(date.split("-")[1]).toLocaleString("en-US", {
-            minimumIntegerDigits: 2,
-            useGrouping: false,
-          })}/${date.split("-")[0]}`
-        : `${parseInt(date.split("-")[2]).toLocaleString("en-US", {
-            minimumIntegerDigits: 2,
-            useGrouping: false,
-          })}/${parseInt(date.split("-")[1]).toLocaleString("en-US", {
-            minimumIntegerDigits: 2,
-            useGrouping: false,
-          })}/${date.split("-")[0]}`
+        ? `${date.split("-")[1]}/${date.split("-")[0]}`
+        : `${date.split("-")[2]}/${date.split("-")[1]}/${date.split("-")[0]}`
     );
 
     setContent(addActionsToData(content));
@@ -77,17 +55,17 @@ export default function Jour() {
 
   const [content, setContent] = useState([
     {
-      Date: "05/08/2022",
+      Date: "05/08\n2022",
       Dépense: "10",
       Comment: "Jus",
     },
     {
-      Date: "05/08/2022",
+      Date: "05/08\n2022",
       Dépense: "10",
       Comment: "Jus",
     },
     {
-      Date: "08/08/2022",
+      Date: "08/08\n2022",
       Dépense: "15",
       Comment: "Jus",
     },
@@ -334,7 +312,7 @@ export default function Jour() {
   return (
     <ScrollView style={[globalStyles.pageContainer, jourStyles.jourContainer]}>
       <Grid nCols={2} style={jourStyles.miniCardContainer}>
-        <Card style={[jourStyles.miniCard]} gradientStyle={jourStyles.right}>
+        <Card style={[jourStyles.miniCard, jourStyles.right]}>
           <View style={jourStyles.miniCardContent}>
             <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
               {capitalise(type)}
@@ -343,7 +321,7 @@ export default function Jour() {
           </View>
         </Card>
 
-        <Card style={[jourStyles.miniCard]} gradientStyle={jourStyles.left}>
+        <Card style={[jourStyles.miniCard, jourStyles.left]}>
           <View style={jourStyles.miniCardContent}>
             <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
               Budget
@@ -352,7 +330,7 @@ export default function Jour() {
           </View>
         </Card>
 
-        <Card style={[jourStyles.miniCard]} gradientStyle={jourStyles.right}>
+        <Card style={[jourStyles.miniCard, jourStyles.right]}>
           <TouchableOpacity
             style={jourStyles.miniCardContent}
             onPress={() =>
@@ -370,7 +348,7 @@ export default function Jour() {
           </TouchableOpacity>
         </Card>
 
-        <Card style={[jourStyles.miniCard]} gradientStyle={jourStyles.left}>
+        <Card style={[jourStyles.miniCard, jourStyles.left]}>
           <View style={jourStyles.miniCardContent}>
             <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
               Dépenses
@@ -379,7 +357,7 @@ export default function Jour() {
           </View>
         </Card>
 
-        <Card style={[jourStyles.miniCard]} gradientStyle={jourStyles.right}>
+        <Card style={[jourStyles.miniCard, jourStyles.right]}>
           <TouchableOpacity
             style={jourStyles.miniCardContent}
             onPress={() =>
@@ -399,7 +377,7 @@ export default function Jour() {
           </TouchableOpacity>
         </Card>
 
-        <Card style={[jourStyles.miniCard]} gradientStyle={jourStyles.left}>
+        <Card style={[jourStyles.miniCard, jourStyles.left]}>
           <TouchableOpacity
             style={jourStyles.miniCardContent}
             onPress={() =>
@@ -429,26 +407,21 @@ export default function Jour() {
         </Card>
       </Grid>
       <View style={jourStyles.addButtonContainer}>
-        <LinearGradient
-          colors={[base_color, base_color_deg]}
-          style={[globalStyles.gradientCircleBtn, jourStyles.circleBtn]}
-          {...deg(45)}
-        >
-          <CircleButton
-            onPress={() =>
-              generalModalOpen(0, { date: type === "jour" ? formatDate : "" })
-            }
-            title={
-              <FontAwesome5
-                name="plus"
-                size={fontSize * 1.5}
-                color={fourth_color}
-              />
-            }
-          />
-        </LinearGradient>
+        <CircleButton
+          btnStyle={jourStyles.circleBtn}
+          onPress={() =>
+            generalModalOpen(0, { date: type === "jour" ? formatDate : "" })
+          }
+          title={
+            <FontAwesome5
+              name="plus"
+              size={fontSize * 1.5}
+              color={fourth_color}
+            />
+          }
+        />
       </View>
-      <Card>
+      <Card style={{ marginBottom: 10 }}>
         <Table
           nbIcons={2}
           headers={week}
@@ -463,6 +436,18 @@ export default function Jour() {
             Tu as encore depensé !
           </Textc>
           <View style={"form"}>
+            {type !== "jour" ? (
+              <Input
+                color={fourth_color}
+                type={type}
+                date={date}
+                onChange={(e) => addFormik.setFieldValue("date", e)}
+                value={addFormik.values.date}
+                id="date"
+                placeholder="Date"
+                error={addFormik.errors?.date}
+              />
+            ) : null}
             <Input
               color={fourth_color}
               type="number"
@@ -481,18 +466,7 @@ export default function Jour() {
               placeholder="Commentaire"
               error={addFormik.errors?.commentaire}
             />
-            {type !== "jour" ? (
-              <Input
-                color={fourth_color}
-                type={type}
-                date={date}
-                onChange={(e) => addFormik.setFieldValue("date", e)}
-                value={addFormik.values.date}
-                id="date"
-                placeholder="Date"
-                error={addFormik.errors?.date}
-              />
-            ) : null}
+
             <View style={modalStyles.modalBtnContainer}>
               <RoundButton
                 btnStyle={modalStyles.roundBtn}
@@ -517,6 +491,18 @@ export default function Jour() {
             Encore une modification ?
           </Textc>
           <View style={"form"}>
+            {type !== "jour" ? (
+              <Input
+                color={fourth_color}
+                type={type}
+                date={date}
+                onChange={(val) => editFormik.setFieldValue("date", val)}
+                value={editFormik.values.date}
+                id="date"
+                placeholder="Date"
+                error={editFormik.errors?.date}
+              />
+            ) : null}
             <Input
               color={fourth_color}
               type="number"

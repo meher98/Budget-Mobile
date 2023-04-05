@@ -25,7 +25,6 @@ export default function Calendrier() {
   };
   const onLayout = (event) => {
     setWidth(event.nativeEvent.layout.width);
-    console.log(event.nativeEvent.layout.width);
   };
   return (
     <>
@@ -40,7 +39,7 @@ export default function Calendrier() {
             initialYear={year}
             allowChangeMonth
             otherMonths
-            parentWidth={width}
+            parentWidth={width - 20}
           />
         </Card>
       </View>

@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
+import Textc from "./Textc";
 
 const CircleButton = ({ onPress, title, textStyle, btnStyle }) => {
   return (
@@ -18,7 +19,7 @@ const CircleButton = ({ onPress, title, textStyle, btnStyle }) => {
         btnStyle,
       ]}
     >
-      <Text style={textStyle}>{title}</Text>
+      <Textc style={textStyle}>{title}</Textc>
     </TouchableOpacity>
   );
 };

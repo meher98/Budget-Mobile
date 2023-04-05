@@ -3,8 +3,7 @@ import { StyleSheet, Dimensions } from "react-native";
 
 export const globalStyles = StyleSheet.create({
   pageContainer: {
-    marginTop: 40,
-    marginBottom: 20,
+    // marginBottom: 60,
     // height: "100%",
   },
   gradientCircleBtn: {
