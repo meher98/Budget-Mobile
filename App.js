@@ -1,51 +1,34 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-
 import Sidebar from "./components/Sidebar";
-import Table from "./components/Table";
 import Calendrier from "./pages/Calendrier";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Test from "./pages/Test";
 import Jour from "./pages/Jour";
 import { DateContext } from "./utils/functions";
 import Budgetisation from "./pages/Budgetisation";
 import { sequelize } from "./backEnd/options";
+import { useFonts } from "expo-font";
+// import * as SplashScreen from "expo-splash-screen";
+
+// SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    UbuntuBold: require("./fonts/Ubuntu/Ubuntu-Bold.ttf"),
+    Ubuntu: require("./fonts/Ubuntu/Ubuntu-Regular.ttf"),
+  });
+
   useEffect(() => {
-    sequelize.sync();
-  }, []);
+    sequelize.sync({ force: true });
+    // if (fontsLoaded) {
+    //   await SplashScreen.hideAsync();
+    // }
+  }, [fontsLoaded]);
 
   const Stack = createNativeStackNavigator();
-  const week = ["Date", "Dépenses", "Budget", "Reste", "Réintégré", "Épargné"];
-  const content = [
-    {
-      Date: "05/08/2022",
-      Total: 10,
-      Budget: 10,
-      Reste: 10,
-      Réintégré: 10,
-      Épargné: 10,
-    },
-    {
-      Date: "06/08/2022",
-      Total: 70,
-      Budget: 10,
-      Reste: 10,
-      Réintégré: 10,
-      Épargné: 10,
-    },
-    {
-      Date: "07/08/2022",
-      Total: 10,
-      Budget: 10,
-      Reste: 10,
-      Réintégré: 10,
-      Épargné: 10,
-    },
-  ];
+
   const navTheme = {
     ...DefaultTheme,
     colors: {
@@ -56,7 +39,9 @@ export default function App() {
   const [date, setDate] = useState("");
   const [type, setType] = useState("");
   const [currentRoute, setCurrentRoute] = useState("");
-
+  if (!fontsLoaded) {
+    return null;
+  }
   return (
     <DateContext.Provider
       value={[date, setDate, type, setType, currentRoute, setCurrentRoute]}
@@ -111,12 +96,3 @@ export default function App() {
     </DateContext.Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

@@ -103,7 +103,11 @@ export default function Input({
       borderColor: color,
     },
   });
-
+  useEffect(() => {
+    inputRef?.current.setNativeProps({
+      style: { fontFamily: "Ubuntu" },
+    });
+  }, []);
   return (
     <View style={Inputstyles.customInputErrorContainer}>
       {type === "semaine" || type === "mois" ? (

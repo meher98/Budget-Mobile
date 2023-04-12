@@ -30,14 +30,17 @@ const jourStyles = StyleSheet.create({
     width: (Dimensions.get("window").width - 40) / 2,
   },
   miniCardContent: {
-    justifyContent: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     width: "100%",
   },
   p: {
+    fontSize: 1.2 * fontSize,
     textAlign: "center",
   },
   miniCardTitle: {
-    fontSize: 1.3 * fontSize,
+    fontSize: fontSize,
     textAlign: "center",
   },
   actionsContainer: {

@@ -51,6 +51,7 @@ export const sidebarStyles = StyleSheet.create({
   gradientText: {
     fontSize: 0.5 * fontSize,
     textAlign: "center",
+    fontFamily: "Ubuntu",
   },
   sidebarPageContainer: {
     paddingTop: StatusBarManager.HEIGHT + 10,

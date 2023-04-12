@@ -59,15 +59,6 @@ export const calendarStyles = StyleSheet.create({
   notInMonth: {
     color: fourth_color + "66",
   },
-  weekday: {
-    color: second_color,
-    textAlign: "center",
-    // fontSize: "14rem",
-    marginBottom: 10,
-  },
-  week: {
-    color: third_color,
-  },
   active: {
     borderWidth: 1,
     borderColor: fourth_color,
@@ -75,34 +66,12 @@ export const calendarStyles = StyleSheet.create({
     backgroundColor: fourth_color,
     color: base_color,
   },
+  weekday: {
+    color: second_color,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  week: {
+    color: third_color,
+  },
 });
-// @media screen and (max-width: 500px): {
-//     days: {
-//         li: {
-//             height: 30px,
-//             width: 30px,
-//             font-size: 1rem,
-//         },
-//         weekday: {
-//             font-size: 12rem,
-//         },
-//     },
-//     month: {
-//         ul: {
-//             li: {
-//                 font-size: 14rem,
-//             },
-//         },
-//         prev: {
-//             position: absolute,
-//             left: 30px,
-//             margin-right: 0,
-//         },
-//         next: {
-//             position: absolute,
-//             right: 30px,
-//             margin-right: 0,
-//         },
-//     },
-// }
-// },)

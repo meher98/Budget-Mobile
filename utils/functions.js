@@ -50,6 +50,14 @@ export const getWeekFromDate = (y, m, d) => {
   let week = weekParams(y, m, indexW, weeks[indexW]);
   return `${twoDigits(week[0])}-${twoDigits(week[1])}-${twoDigits(week[2])}`;
 };
+
+export const getFormatWeekFromDate = (date) => {
+  const [d, m, y] = date.split("/");
+  let week = getWeekFromDate(parseInt(y), parseInt(m) - 1, parseInt(d));
+
+  return `${week.split("-")[2]}/${week.split("-")[1]}/${week.split("-")[0]}`;
+};
+
 export const stopScrolling = () => {
   // To get the scroll position of current webpage
   let TopScroll = window.pageYOffset || document.documentElement.scrollTop;
@@ -113,7 +121,7 @@ export const getDatesInRange = (dateD, dateF) => {
 };
 export const dateDisplay = (date) => {
   let newDate = "";
-  for (let i = 0; i < date.length; i++) {
+  for (let i = 0; i < date?.length; i++) {
     if (i === 5) {
       newDate += "\n";
     } else {

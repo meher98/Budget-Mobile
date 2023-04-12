@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, Dimensions } from "react-native";
 import { calendarStyles } from "../styles/calendar";
 import { twoDigits, verifWeekInMonth, weekParams } from "../utils/functions";
 import { AntDesign } from "@expo/vector-icons";
@@ -7,7 +7,7 @@ import Grid from "./Grid";
 import Textc from "./Textc";
 import { base_color } from "../styles/vars";
 
-export default function Calendar({
+function Calendar({
   initialMonth,
   initialYear,
   dayClick,
@@ -39,7 +39,7 @@ export default function Calendar({
   useEffect(() => {
     !isNaN(parentWidth) && typeof parentWidth === "number"
       ? setWidth(parentWidth)
-      : setWidth(0);
+      : setWidth(Dimensions.get("window").width - 40);
   }, [parentWidth]);
 
   const prevMonth = () => {
@@ -180,7 +180,7 @@ export default function Calendar({
                         ? weekClick(
                             ...weekParams(
                               calendar.options.year,
-                              calendar.options.monthIndex + 1,
+                              calendar.options.monthIndex,
                               ind,
                               el
                             )
@@ -219,6 +219,7 @@ export default function Calendar({
                     <Textc
                       key={"d" + i}
                       style={[
+                        calendarStyles.li,
                         `${day}-${month}-${year}` ===
                         `${e.day}-${e.monthIndex}-${e.year}`
                           ? calendarStyles.active
@@ -231,7 +232,6 @@ export default function Calendar({
                           paddingTop: width / (2 * nCols) - 10,
                           paddingBottom: width / (2 * nCols) - 10,
                         },
-                        calendarStyles.li,
                       ]}
                     >
                       {e.className.includes("month-day")
@@ -253,7 +253,7 @@ export default function Calendar({
                       ? weekClick(
                           ...weekParams(
                             calendar.options.year,
-                            calendar.options.monthIndex + 1,
+                            calendar.options.monthIndex,
                             ind,
                             el
                           )
@@ -323,3 +323,7 @@ export default function Calendar({
     </View>
   );
 }
+Calendar.defaultProps = {
+  parentWidth: Dimensions.get("window").width - 40,
+};
+export default Calendar;

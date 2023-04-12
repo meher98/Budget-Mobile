@@ -1,4 +1,5 @@
 import { Text, TouchableOpacity } from "react-native";
+import { globalStyles } from "../styles/global";
 import {
   base_color,
   fourth_color,
@@ -27,10 +28,14 @@ const Textc = ({ children, color, style, onPress, touchStyle }) => {
   };
   return onPress ? (
     <TouchableOpacity onPress={onPress} style={touchStyle}>
-      <Text style={[{ color: getColor(color) }, style]}>{children}</Text>
+      <Text style={[{ color: getColor(color) }, globalStyles.text, style]}>
+        {children}
+      </Text>
     </TouchableOpacity>
   ) : (
-    <Text style={[{ color: getColor(color) }, style]}>{children}</Text>
+    <Text style={[{ color: getColor(color) }, style, globalStyles.text]}>
+      {children}
+    </Text>
   );
 };
 

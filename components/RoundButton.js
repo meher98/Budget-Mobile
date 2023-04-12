@@ -5,7 +5,7 @@ const RoundButton = ({ onPress, title, textStyle, btnStyle }) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={[style, btnStyle]}>
-        <Text style={textStyle}>{title}</Text>
+        <Text style={(textStyle, { fontFamily: "UbuntuBold" })}>{title}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -17,8 +17,6 @@ const style = StyleSheet.create({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  cursor: "pointer",
-  fontWeight: "500",
 });
 
 export default RoundButton;

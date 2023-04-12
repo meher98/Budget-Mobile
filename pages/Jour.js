@@ -13,11 +13,10 @@ import { capitalise, DateContext, evaluate } from "../utils/functions";
 import ConfirmModal from "../components/ConfirmModal";
 import CircleButton from "../components/CircleButton";
 import {
-  Text,
   TouchableOpacity,
   View,
   ScrollView,
-  Dimensions,
+  ImageBackground,
 } from "react-native";
 import RoundButton from "../components/RoundButton";
 import { fontSize, fourth_color } from "../styles/vars";
@@ -26,50 +25,125 @@ import Textc from "../components/Textc";
 import Grid from "../components/Grid";
 import { modalStyles } from "../styles/modal";
 import confirmModalStyles from "../styles/confirmModal";
+import {
+  addDepense,
+  deleteDepense,
+  getAllDepensesByDate,
+  getAllDepensesByMonth,
+  getAllDepensesByWeek,
+} from "../backEnd/dao/depenseDao";
+import {
+  getBudgetByDate,
+  getBudgetByMonth,
+  getBudgetByWeek,
+} from "../backEnd/dao/budgetDao";
+import { addOrUpdateCash, getCash } from "../backEnd/dao/cashDao";
+import Wallet from "../icons/Wallet";
+import Calendar from "../icons/Calendar";
+import Refund from "../icons/Refund";
+import Cash from "../icons/Cash";
+import Save from "../icons/Save";
+import CheckDollar from "../icons/CheckDollar";
+import Bill from "../icons/Bill";
 
 export default function Jour() {
   const [show, setShow] = useState([false, false, false, false, false, false]);
   const [epargne, setEpargne] = useState("");
   const [cash, setCash] = useState("");
+  const [budget, setBudget] = useState();
+  const [reste, setReste] = useState();
   const [reintegre, setReintegre] = useState("");
   const week = ["Date", "Dépenses", "Commentaire", "Actions"];
   const { type, date } = useRoute().params;
   const dateType = useContext(DateContext);
-  const [formatDate, setFormatDate] = useState(
-    `${date.split("-")[2]}/${date.split("-")[1]}/${date.split("-")[0]}`
-  );
+  const [formatDate, setFormatDate] = useState();
+  const [idToDelete, setIdToDelete] = useState("");
+
+  const update = () => {
+    getCash(formatDate, type)
+      .then((val) => {
+        console.log(type);
+        if (val) {
+          setCash(val.cash);
+        } else {
+          setCash("");
+          cashFormik.setFieldValue("montant", "");
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    switch (type) {
+      case "jour":
+        getAllDepensesByDate(formatDate)
+          .then((val) => {
+            setContent(addActionsToData(val));
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+        getBudgetByDate(formatDate)
+          .then((val) => {
+            setBudget(val.budget);
+            setReste(val.reste);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+        break;
+      case "semaine":
+        getAllDepensesByWeek(formatDate)
+          .then((val) => {
+            setContent(addActionsToData(val));
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+        getBudgetByWeek(formatDate)
+          .then((val) => {
+            setBudget(val.budget);
+            setReste(val.reste);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+        break;
+      case "mois":
+        getAllDepensesByMonth(formatDate)
+          .then((val) => {
+            setContent(addActionsToData(val));
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+        getBudgetByMonth(formatDate)
+          .then((val) => {
+            setBudget(val.budget);
+            setReste(val.reste);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+        break;
+    }
+  };
+
   useEffect(() => {
     setFormatDate(
       type === "mois"
         ? `${date.split("-")[1]}/${date.split("-")[0]}`
         : `${date.split("-")[2]}/${date.split("-")[1]}/${date.split("-")[0]}`
     );
-
-    setContent(addActionsToData(content));
+    update();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date, type, formatDate]);
+
   useEffect(() => {
     dateType[1](date);
     dateType[3](type);
   }, [date, type]);
 
-  const [content, setContent] = useState([
-    {
-      Date: "05/08\n2022",
-      Dépense: "10",
-      Comment: "Jus",
-    },
-    {
-      Date: "05/08\n2022",
-      Dépense: "10",
-      Comment: "Jus",
-    },
-    {
-      Date: "08/08\n2022",
-      Dépense: "15",
-      Comment: "Jus",
-    },
-  ]);
+  const [content, setContent] = useState([]);
   const addActionsToData = (data) => {
     let X = [];
     for (let el of data) {
@@ -96,6 +170,7 @@ export default function Jour() {
             style={jourStyles.actionIconRight}
             onPress={() => {
               generalModalOpen(5);
+              setIdToDelete(el.id);
             }}
           >
             <FontAwesome5
@@ -109,6 +184,17 @@ export default function Jour() {
       X.push(x);
     }
     return X;
+  };
+  const sommeDepenses = (tab) => {
+    if (tab.length === 0) {
+      return 0;
+    }
+    let x = 0;
+    idToDelete;
+    for (let el of tab) {
+      x += parseFloat(el.montant);
+    }
+    return x;
   };
   const generalModalClose = (i) => {
     const formik = [
@@ -140,6 +226,18 @@ export default function Jour() {
     }
     setShow([...x]);
   };
+
+  const confirmFunction = () => {
+    deleteDepense(idToDelete)
+      .then(() => {
+        update();
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    generalModalClose(5);
+  };
+
   const depenseSchema = yup.object({
     montant: yup.string().required("Ce champ est obligatoire"),
     commentaire: yup.string().max(20, "Commentaire trop long"),
@@ -172,8 +270,15 @@ export default function Jour() {
       }
     },
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-      generalModalClose(0);
+      addDepense(values)
+        .then((val) => {
+          setContent([...addActionsToData([val]), ...content]);
+          update();
+          generalModalClose(0);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
   });
   const editFormik = useFormik({
@@ -245,9 +350,7 @@ export default function Jour() {
   });
   const cashFormik = useFormik({
     initialValues: {
-      montant: "",
-      type: "",
-      date: "",
+      montant: cash.toString(),
     },
     validateOnChange: false,
     validate: (values) => {
@@ -272,8 +375,14 @@ export default function Jour() {
       }
     },
     onSubmit: (values) => {
-      setCash(values.montant);
-      generalModalClose(3);
+      addOrUpdateCash(formatDate, type, values.montant)
+        .then((val) => {
+          setCash(val.cash);
+          generalModalClose(3);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
   });
   const reintegreFormik = useFormik({
@@ -312,99 +421,183 @@ export default function Jour() {
   return (
     <ScrollView style={[globalStyles.pageContainer, jourStyles.jourContainer]}>
       <Grid nCols={2} style={jourStyles.miniCardContainer}>
-        <Card style={[jourStyles.miniCard, jourStyles.right]}>
-          <View style={jourStyles.miniCardContent}>
-            <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
-              {capitalise(type)}
-            </Textc>
-            <Textc style={jourStyles.p}>{formatDate}</Textc>
-          </View>
-        </Card>
-
-        <Card style={[jourStyles.miniCard, jourStyles.left]}>
-          <View style={jourStyles.miniCardContent}>
-            <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
-              Budget
-            </Textc>
-            <Textc style={jourStyles.p}>100DT</Textc>
-          </View>
-        </Card>
-
-        <Card style={[jourStyles.miniCard, jourStyles.right]}>
-          <TouchableOpacity
-            style={jourStyles.miniCardContent}
-            onPress={() =>
-              generalModalOpen(3, {
-                date: formatDate,
-                type: type,
-                montant: cash,
-              })
-            }
-          >
-            <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>Cash</Textc>
-            <Textc style={jourStyles.p}>
-              {cash === "" ? "-" : `${cash}DT`}
-            </Textc>
-          </TouchableOpacity>
-        </Card>
-
-        <Card style={[jourStyles.miniCard, jourStyles.left]}>
-          <View style={jourStyles.miniCardContent}>
-            <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
-              Dépenses
-            </Textc>
-            <Textc style={jourStyles.p}>100DT</Textc>
-          </View>
-        </Card>
-
-        <Card style={[jourStyles.miniCard, jourStyles.right]}>
-          <TouchableOpacity
-            style={jourStyles.miniCardContent}
-            onPress={() =>
-              generalModalOpen(4, {
-                date: formatDate,
-                type: type,
-                montant: reintegre,
-              })
-            }
-          >
-            <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
-              Réintégré
-            </Textc>
-            <Textc style={jourStyles.p}>
-              {reintegre === "" ? "-" : `${reintegre}DT`}
-            </Textc>
-          </TouchableOpacity>
-        </Card>
-
-        <Card style={[jourStyles.miniCard, jourStyles.left]}>
-          <TouchableOpacity
-            style={jourStyles.miniCardContent}
-            onPress={() =>
-              generalModalOpen(2, {
-                date: formatDate,
-                type: type,
-                montant: epargne,
-              })
-            }
-          >
-            <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
-              Épargné
-            </Textc>
-            <Textc style={jourStyles.p}>
-              {epargne === "" ? "-" : `${epargne}DT`}
-            </Textc>
-          </TouchableOpacity>
-        </Card>
-
-        <Card style={[jourStyles.miniCard]}>
-          <View style={jourStyles.miniCardContent}>
-            <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
-              Reste
-            </Textc>
-            <Textc style={jourStyles.p}>100DT</Textc>
-          </View>
-        </Card>
+        <ImageBackground
+          source={require("../assets/waves.png")}
+          imageStyle={[globalStyles.waveBG, jourStyles.right]}
+        >
+          <Card style={[jourStyles.miniCard, jourStyles.right]}>
+            <View style={jourStyles.miniCardContent}>
+              <Calendar
+                style={{ marginRight: 10 }}
+                filled={true}
+                color={fourth_color}
+                size={2}
+              />
+              <View>
+                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                  {capitalise(type)}
+                </Textc>
+                <Textc style={{ marginBottom: 0.35 * fontSize }}>
+                  {formatDate}
+                </Textc>
+              </View>
+            </View>
+          </Card>
+        </ImageBackground>
+        <ImageBackground
+          source={require("../assets/waves.png")}
+          imageStyle={[globalStyles.waveBG, jourStyles.left]}
+        >
+          <Card style={[jourStyles.miniCard, jourStyles.left]}>
+            <View style={jourStyles.miniCardContent}>
+              <CheckDollar
+                style={{ marginRight: 10 }}
+                color={fourth_color}
+                size={2}
+              />
+              <View>
+                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                  Budget
+                </Textc>
+                <Textc style={jourStyles.p}>{`${budget}DT`}</Textc>
+              </View>
+            </View>
+          </Card>
+        </ImageBackground>
+        <ImageBackground
+          source={require("../assets/waves.png")}
+          imageStyle={[globalStyles.waveBG, jourStyles.right]}
+        >
+          <Card style={[jourStyles.miniCard, jourStyles.right]}>
+            <TouchableOpacity
+              style={jourStyles.miniCardContent}
+              onPress={() =>
+                generalModalOpen(3, {
+                  date: formatDate,
+                  type: type,
+                  montant: cash.toString(),
+                })
+              }
+            >
+              <Cash
+                style={{ marginRight: 10 }}
+                filled={true}
+                color={fourth_color}
+                size={2}
+              />
+              <View>
+                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                  Cash
+                </Textc>
+                <Textc style={jourStyles.p}>
+                  {cash === "" ? "-" : `${cash}DT`}
+                </Textc>
+              </View>
+            </TouchableOpacity>
+          </Card>
+        </ImageBackground>
+        <ImageBackground
+          source={require("../assets/waves.png")}
+          imageStyle={[globalStyles.waveBG, jourStyles.left]}
+        >
+          <Card style={[jourStyles.miniCard, jourStyles.left]}>
+            <View style={jourStyles.miniCardContent}>
+              <Bill
+                style={{ marginRight: 10 }}
+                filled={true}
+                color={fourth_color}
+                size={2}
+              />
+              <View>
+                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                  Dépenses
+                </Textc>
+                <Textc style={jourStyles.p}>
+                  {`${sommeDepenses(content)}DT`}
+                </Textc>
+              </View>
+            </View>
+          </Card>
+        </ImageBackground>
+        <ImageBackground
+          source={require("../assets/waves.png")}
+          imageStyle={[globalStyles.waveBG, jourStyles.right]}
+        >
+          <Card style={[jourStyles.miniCard, jourStyles.right]}>
+            <TouchableOpacity
+              style={jourStyles.miniCardContent}
+              onPress={() =>
+                generalModalOpen(4, {
+                  date: formatDate,
+                  type: type,
+                  montant: reintegre,
+                })
+              }
+            >
+              <Refund
+                style={{ marginRight: 10 }}
+                filled={true}
+                color={fourth_color}
+                size={2}
+              />
+              <View>
+                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                  Réintégré
+                </Textc>
+                <Textc style={jourStyles.p}>
+                  {reintegre === "" ? "-" : `${reintegre}DT`}
+                </Textc>
+              </View>
+            </TouchableOpacity>
+          </Card>
+        </ImageBackground>
+        <ImageBackground
+          source={require("../assets/waves.png")}
+          imageStyle={[globalStyles.waveBG, jourStyles.left]}
+        >
+          <Card style={[jourStyles.miniCard, jourStyles.left]}>
+            <TouchableOpacity
+              style={jourStyles.miniCardContent}
+              onPress={() =>
+                generalModalOpen(2, {
+                  date: formatDate,
+                  type: type,
+                  montant: epargne,
+                })
+              }
+            >
+              <Save style={{ marginRight: 10 }} color={fourth_color} size={2} />
+              <View>
+                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                  Épargné
+                </Textc>
+                <Textc style={jourStyles.p}>
+                  {epargne === "" ? "-" : `${epargne}DT`}
+                </Textc>
+              </View>
+            </TouchableOpacity>
+          </Card>
+        </ImageBackground>
+        <ImageBackground
+          source={require("../assets/waves.png")}
+          imageStyle={[globalStyles.waveBG]}
+        >
+          <Card style={[jourStyles.miniCard]}>
+            <View style={[jourStyles.miniCardContent]}>
+              <Wallet
+                style={{ marginRight: 30, transform: [{ rotate: "-45deg" }] }}
+                color={fourth_color}
+                size={2}
+              />
+              <View>
+                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                  Reste
+                </Textc>
+                <Textc style={jourStyles.p}>{`${reste}DT`}</Textc>
+              </View>
+            </View>
+          </Card>
+        </ImageBackground>
       </Grid>
       <View style={jourStyles.addButtonContainer}>
         <CircleButton
@@ -426,7 +619,8 @@ export default function Jour() {
           nbIcons={2}
           headers={week}
           content={content}
-          mobile={["Commentaire"]}
+          dateIndexTab={[0]}
+          toIgnore={["id"]}
         />
       </Card>
 
@@ -640,6 +834,7 @@ export default function Jour() {
         show={show[5]}
         closeFunction={() => generalModalClose(5)}
         text="Voulez vous supprimer cet element ?"
+        confirmFunction={() => confirmFunction()}
       />
     </ScrollView>
   );

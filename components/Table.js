@@ -1,8 +1,9 @@
-import { Dimensions, View } from "react-native";
+import { Dimensions, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { tableStyles } from "../styles/table";
 import Textc from "./Textc";
 import { dateDisplay } from "../utils/functions";
+import { base_color } from "../styles/vars";
 
 const Table = ({
   headers,
@@ -29,21 +30,19 @@ const Table = ({
   const transpose = (arr) => {
     return arr[0].map((_, i) => arr.map((row) => row[i]));
   };
-  const max = (tab) => {
+  const max = (tab, j) => {
     let m = 0;
-    for (let el of tab) {
-      if (el === "[object Object]") {
-        if (3 * nbIcons > m) {
-          m = 3.5 * nbIcons;
-        }
-      } else {
-        if (dateIndexTab.includes(tab.indexOf(el))) {
-          if (5 > m) {
-            m = 5;
+    if (dateIndexTab.includes(j)) {
+      m = tab[0].length > 5 ? tab[0].length : 5;
+    } else {
+      for (let i = 0; i < tab.length; i++) {
+        if (tab[i] === "[object Object]") {
+          if (3 * nbIcons > m) {
+            m = 3.5 * nbIcons;
           }
         } else {
-          if (el?.length > m) {
-            m = el.length;
+          if (tab[i].length > m) {
+            m = tab[i].length;
           }
         }
       }
@@ -58,26 +57,27 @@ const Table = ({
   };
   const trans = transpose([
     headers,
-    ...filtredContent.map((el) => Object.values(el).map((e) => e.toString())),
+    ...filtredContent.map((el) => Object.values(el).map((e) => e?.toString())),
   ]);
-  const maxTab = trans.map((el) => max(el));
+  const maxTab = trans.map((el, i) => max(el, i));
   return (
     <View style={[tableStyles.container]}>
       <View style={[tableStyles.table, { width: parentWidth }]}>
         <View style={tableStyles.headersRow}>
           {headers.map((header, i) => (
-            <Textc
-              color="base"
+            <Text
               style={[
-                tableStyles.header,
                 {
                   width: ((parentWidth - 10) * maxTab[i]) / somme(maxTab),
+                  color: base_color,
+                  fontFamily: "UbuntuBold",
                 },
+                tableStyles.header,
               ]}
               key={i}
             >
               {header}
-            </Textc>
+            </Text>
           ))}
         </View>
         {filtredContent.length === 0 ? (

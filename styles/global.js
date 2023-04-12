@@ -1,5 +1,4 @@
-import { base_color, third_color } from "./vars";
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet } from "react-native";
 
 export const globalStyles = StyleSheet.create({
   pageContainer: {
@@ -14,5 +13,14 @@ export const globalStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     fontWeight: "500",
+  },
+  text: {
+    fontFamily: "Ubuntu",
+  },
+  waveBG: {
+    resizeMode: "cover",
+    justifyContent: "center",
+    borderRadius: 10,
+    opacity: 0.3,
   },
 });

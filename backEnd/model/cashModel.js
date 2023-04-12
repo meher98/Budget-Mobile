@@ -1,19 +1,16 @@
 import Sequelize from "rn-sequelize";
 import { sequelize } from "../options";
 
-export const Depense = sequelize.define("Depense", {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
+export const Cash = sequelize.define("Cash", {
   date: {
     type: Sequelize.STRING,
+    primaryKey: true,
   },
-  commentaire: {
+  type: {
     type: Sequelize.STRING,
+    primaryKey: true,
   },
-  montant: {
+  cash: {
     type: Sequelize.FLOAT,
   },
 });

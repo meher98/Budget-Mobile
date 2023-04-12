@@ -34,7 +34,7 @@ export const tableStyles = StyleSheet.create({
     padding: 5,
   },
   header: {
-    fontWeight: "bold",
+    fontFamily: "UbuntuBold",
     padding: 5,
     textAlign: "center",
   },

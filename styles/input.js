@@ -28,6 +28,7 @@ const Inputstyles = StyleSheet.create({
     left: 0,
     top: 0,
     fontSize: 1.5 * fontSize,
+    fontFamily: "Ubuntu",
     // transition: "all $transition-time",
   },
 
@@ -39,6 +40,7 @@ const Inputstyles = StyleSheet.create({
     marginTop: 15,
     paddingBottom: 5,
     fontSize: fontSize,
+    fontStyle: "Ubuntu",
   },
   inputCalendarContainer: {
     position: "absolute",

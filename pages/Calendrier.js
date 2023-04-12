@@ -4,7 +4,7 @@ import Calendar from "../components/Calendar";
 import Card from "../components/Card";
 import { globalStyles } from "../styles/global";
 import { View } from "react-native";
-import { DateContext } from "../utils/functions";
+import { DateContext, twoDigits } from "../utils/functions";
 
 export default function Calendrier() {
   const [width, setWidth] = useState();
@@ -16,7 +16,7 @@ export default function Calendrier() {
   const setCurrentRoute = dateType[5];
   const link = (type, ...params) => {
     let str = "";
-    params.map((e) => (str += `${e}-`));
+    params.map((e) => (str += `${twoDigits(e)}-`));
     navigation.navigate("depenses", {
       type: type,
       date: str.slice(0, -1),

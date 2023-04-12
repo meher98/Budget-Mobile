@@ -26,18 +26,22 @@ export const getAllBudgetGlobal = () =>
 export const addBudgetGlobal = async (values) =>
   new Promise(async (resolve, reject) => {
     const t = await sequelize.transaction();
-    const budget = parseFloat(values.budget).toFixed(2);
+    const budget = Number(parseFloat(values.budget).toFixed(2));
     const nbJours = dateDiffrence(values.dateDebut, values.dateFin) + 1;
     const joursTab = getDatesInRange(values.dateDebut, values.dateFin);
+
     try {
-      const added = await BudgetGlobal.create(values, { transaction: t });
+      const added = await BudgetGlobal.create(
+        { ...values, budget: budget, reste: budget },
+        { transaction: t }
+      );
       for (let jour of joursTab) {
-        let el = await Budget.create(
+        await Budget.create(
           {
             idBudgetGlobal: added.dataValues.id,
             date: jour,
-            budget: budget / nbJours,
-            reste: budget / nbJours,
+            budget: parseFloat(budget / nbJours).toFixed(2),
+            reste: parseFloat(budget / nbJours).toFixed(2),
           },
           { transaction: t }
         );
