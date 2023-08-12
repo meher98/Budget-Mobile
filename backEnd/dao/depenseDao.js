@@ -4,7 +4,6 @@ import {
   oneDigit,
   twoDigits,
 } from "../../utils/functions";
-import { BudgetGlobal } from "../model/budgetGlobalModel";
 import { Budget } from "../model/budgetModel";
 import { Cash } from "../model/cashModel";
 import { Depense } from "../model/depenseModel";
@@ -55,7 +54,7 @@ export const getAllDepensesByWeek = async (week) =>
             id: el.id,
             date: el.date,
             montant: el.montant,
-            comment: el.commentaire,
+            commentaire: el.commentaire,
           };
         })
       );
@@ -103,14 +102,6 @@ export const addDepense = async (values) =>
       );
       budget.reste = parseFloat(budget.dataValues.reste - montant).toFixed(2);
       await budget.save({ transaction: t });
-      let budgetGlobal = await BudgetGlobal.findOne(
-        { where: { id: budget.dataValues.idBudgetGlobal } },
-        { transaction: t }
-      );
-      budgetGlobal.reste = parseFloat(
-        budgetGlobal.dataValues.reste - montant
-      ).toFixed(2);
-      await budgetGlobal.save({ transaction: t });
 
       let cashDay = await Cash.findOne(
         { where: { date: values.date, type: "jour" } },
@@ -181,14 +172,6 @@ export const deleteDepense = async (id) =>
         parseFloat(budget.dataValues.reste) + parseFloat(montant)
       ).toFixed(2);
       await budget.save({ transaction: t });
-      let budgetGlobal = await BudgetGlobal.findOne(
-        { where: { id: budget.dataValues.idBudgetGlobal } },
-        { transaction: t }
-      );
-      budgetGlobal.reste =
-        parseFloat(budgetGlobal.dataValues.reste) +
-        parseFloat(montant).toFixed(2);
-      await budgetGlobal.save({ transaction: t });
 
       let cashDay = await Cash.findOne(
         { where: { date: values.date, type: "jour" } },
@@ -232,6 +215,131 @@ export const deleteDepense = async (id) =>
       }
       await Depense.destroy({ where: { id: id } }, { transaction: t }),
         await t.commit();
+      resolve("ok");
+    } catch (e) {
+      await t.rollback();
+      reject(e);
+    }
+  });
+export const updateDepense = async (id, newValues) =>
+  new Promise(async (resolve, reject) => {
+    const t = await sequelize.transaction();
+
+    try {
+      let toUpdate = await Depense.findOne(
+        { where: { id: id } },
+        { transaction: t }
+      );
+      let values = toUpdate.dataValues;
+      const montant = parseFloat(values.montant).toFixed(2);
+      const newMontant = parseFloat(newValues.montant).toFixed(2);
+      let budget = await Budget.findOne(
+        { where: { date: values.date } },
+        { transaction: t }
+      );
+      budget.reste = (
+        parseFloat(budget.dataValues.reste) + parseFloat(montant)
+      ).toFixed(2);
+      await budget.save({ transaction: t });
+      let newBudget = await Budget.findOne(
+        { where: { date: newValues.date } },
+        { transaction: t }
+      );
+      newBudget.reste = (
+        parseFloat(newBudget.dataValues.reste) - parseFloat(newMontant)
+      ).toFixed(2);
+      await newBudget.save({ transaction: t });
+
+      let cashDay = await Cash.findOne(
+        { where: { date: values.date, type: "jour" } },
+        { transaction: t }
+      );
+
+      if (cashDay) {
+        cashDay.cash = (
+          parseFloat(cashDay.dataValues.cash) + parseFloat(montant)
+        ).toFixed(2);
+        await cashDay.save({ transaction: t });
+      }
+      let newCashDay = await Cash.findOne(
+        { where: { date: newValues.date, type: "jour" } },
+        { transaction: t }
+      );
+      if (newCashDay) {
+        newCashDay.cash = (
+          parseFloat(newCashDay.dataValues.cash) - parseFloat(newMontant)
+        ).toFixed(2);
+        await newCashDay.save({ transaction: t });
+      }
+
+      let cashWeek = await Cash.findOne(
+        {
+          where: { date: getFormatWeekFromDate(values.date), type: "semaine" },
+        },
+        { transaction: t }
+      );
+
+      if (cashWeek) {
+        cashWeek.cash = (
+          parseFloat(cashWeek.dataValues.cash) + parseFloat(montant)
+        ).toFixed(2);
+        await cashWeek.save({ transaction: t });
+      }
+      let newCashWeek = await Cash.findOne(
+        {
+          where: {
+            date: getFormatWeekFromDate(newValues.date),
+            type: "semaine",
+          },
+        },
+        { transaction: t }
+      );
+      if (newCashWeek) {
+        newCashWeek.cash = (
+          parseFloat(newCashWeek.dataValues.cash) - parseFloat(newMontant)
+        ).toFixed(2);
+        await newCashWeek.save({ transaction: t });
+      }
+
+      let cashMonth = await Cash.findOne(
+        {
+          where: {
+            date: `${values.date.split("/")[1]}/${values.date.split("/")[2]}`,
+            type: "mois",
+          },
+        },
+        { transaction: t }
+      );
+
+      if (cashMonth) {
+        cashMonth.cash = (
+          parseFloat(cashMonth.dataValues.cash) + parseFloat(montant)
+        ).toFixed(2);
+        await cashMonth.save({ transaction: t });
+      }
+      let newCashMonth = await Cash.findOne(
+        {
+          where: {
+            date: `${newValues.date.split("/")[1]}/${
+              newValues.date.split("/")[2]
+            }`,
+            type: "mois",
+          },
+        },
+        { transaction: t }
+      );
+      if (newCashMonth) {
+        newCashMonth.cash = (
+          parseFloat(newCashMonth.dataValues.cash) - parseFloat(newMontant)
+        ).toFixed(2);
+        await newCashMonth.save({ transaction: t });
+      }
+
+      toUpdate.date = newValues.date;
+      toUpdate.commentaire = newValues.commentaire;
+      toUpdate.montant = newMontant;
+      await toUpdate.save({ transaction: t });
+      await t.commit();
       resolve("ok");
     } catch (e) {
       await t.rollback();

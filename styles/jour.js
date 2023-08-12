@@ -17,18 +17,31 @@ const jourStyles = StyleSheet.create({
   },
   miniCard: {
     flexDirection: "column",
-    padding: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
   },
-  left: {
+  right: {
     marginLeft: 10,
     marginBottom: 20,
     width: (Dimensions.get("window").width - 40) / 2,
   },
-  right: {
+  left: {
     marginRight: 10,
     marginBottom: 20,
     width: (Dimensions.get("window").width - 40) / 2,
   },
+
+  rightM: {
+    marginLeft: 10,
+    marginTop: 20,
+    width: (Dimensions.get("window").width - 100) / 2,
+  },
+  leftM: {
+    marginRight: 10,
+    marginTop: 20,
+    width: (Dimensions.get("window").width - 100) / 2,
+  },
+
   miniCardContent: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -37,11 +50,10 @@ const jourStyles = StyleSheet.create({
   },
   p: {
     fontSize: 1.2 * fontSize,
-    textAlign: "center",
+    textAlign: "right",
   },
   miniCardTitle: {
     fontSize: fontSize,
-    textAlign: "center",
   },
   actionsContainer: {
     display: "flex",

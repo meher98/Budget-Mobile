@@ -85,7 +85,7 @@ export default function Sidebar(props) {
             Accueil
           </Textc>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={sidebarStyles.sidebarItem}
           onPress={() => {
             setCurrentRoute("Budgetisation");
@@ -103,7 +103,7 @@ export default function Sidebar(props) {
           <Textc color="fourth" style={sidebarStyles.gradientText}>
             Budgets
           </Textc>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           style={sidebarStyles.sidebarItem}
           onPress={() => {

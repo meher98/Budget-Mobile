@@ -7,7 +7,7 @@ export const modalStyles = StyleSheet.create({
     top: 0,
     left: 0,
     height: "200%",
-    width: "100%",
+    width: "200%",
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     zIndex: 1,
     display: "flex",

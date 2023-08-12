@@ -41,8 +41,8 @@ const Table = ({
             m = 3.5 * nbIcons;
           }
         } else {
-          if (tab[i].length > m) {
-            m = tab[i].length;
+          if (tab[i]?.length > m) {
+            m = tab[i]?.length;
           }
         }
       }

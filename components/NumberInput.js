@@ -18,7 +18,7 @@ export const NumberInput = forwardRef(function NumberInput(
         }
       }
     } else {
-      if (!isNaN(char) || char === "." || val.length === 0) {
+      if (!isNaN(char) || char === "." || char === "-" || val.length === 0) {
         onChange(val);
       }
     }

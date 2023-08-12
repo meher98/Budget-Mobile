@@ -7,6 +7,7 @@ import Input from "../components/Input";
 import { fourth_color, third_color } from "../styles/vars";
 import ConfirmModal from "../components/ConfirmModal";
 import { globalStyles } from "../styles/global";
+import { exportData, importData } from "../backEnd/dao/exportImportDao";
 
 export default function Test() {
   const [open, setOpen] = useState(false);
@@ -14,31 +15,9 @@ export default function Test() {
   return (
     <View style={globalStyles.pageContainer}>
       <Card>
-        <RoundButton title="test" onPress={() => setOpen(true)} />
+        <RoundButton title="Import" onPress={() => importData()} />
+        <RoundButton title="Export" onPress={() => exportData()} />
       </Card>
-      <View></View>
-      <ConfirmModal
-        text="Do you want to confirm ?"
-        show={open}
-        closeFunction={() => setOpen(false)}
-      >
-        <View>
-          {/* <Input
-            placeholder={"test"}
-            type="number"
-            value={value}
-            onChange={setValue}
-            color={fourth_color}
-          /> */}
-          <Input
-            placeholder={"test"}
-            type="semaine"
-            value={value}
-            onChange={setValue}
-            color={fourth_color}
-          />
-        </View>
-      </ConfirmModal>
     </View>
   );
 }

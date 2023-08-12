@@ -40,7 +40,7 @@ const Inputstyles = StyleSheet.create({
     marginTop: 15,
     paddingBottom: 5,
     fontSize: fontSize,
-    fontStyle: "Ubuntu",
+    fontFamily: "Ubuntu",
   },
   inputCalendarContainer: {
     position: "absolute",

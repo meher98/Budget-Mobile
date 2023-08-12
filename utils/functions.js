@@ -119,6 +119,42 @@ export const getDatesInRange = (dateD, dateF) => {
   }
   return dates;
 };
+
+export const getDaysInMonth = (monthDate) => {
+  const monthTab = monthDate.split("/");
+  const month = parseInt(oneDigit(monthTab[0])) - 1;
+  const year = parseInt(monthTab[1]);
+  var date = new Date(year, month, 1);
+  var days = [];
+  while (date.getMonth() === month) {
+    let newDate = new Date(date);
+    days.push(
+      `${twoDigits(newDate.getDate())}/${twoDigits(newDate.getMonth() + 1)}/${
+        newDate.getYear() + 1900
+      }`
+    );
+    date.setDate(date.getDate() + 1);
+  }
+  return days;
+};
+
+export const getDaysInWeek = (week) => {
+  const weekDate = week.split("/");
+  const calendar = new JsonCalendar({
+    languageCode: "fr",
+    monthIndex: parseInt(oneDigit(weekDate[1])) - 1,
+    year: parseInt(weekDate[2]),
+  });
+  const weekTab = calendar.weeks[parseInt(oneDigit(weekDate[0]))];
+  var days = [];
+  for (let day of weekTab) {
+    days.push(
+      `${twoDigits(day.day)}/${twoDigits(day.monthIndex + 1)}/${day.year}`
+    );
+  }
+  return days;
+};
+
 export const dateDisplay = (date) => {
   let newDate = "";
   for (let i = 0; i < date?.length; i++) {
@@ -129,4 +165,32 @@ export const dateDisplay = (date) => {
     }
   }
   return newDate;
+};
+export const getNextMonth = (myMonth) => {
+  var month = new Date(convertDate("01/" + myMonth));
+  if (month.getMonth() == 11) {
+    var current = new Date(month.getFullYear() + 1, 0, 1);
+  } else {
+    var current = new Date(month.getFullYear(), month.getMonth() + 1, 1);
+  }
+  current.setDate(current.getDate() + 1);
+  return `${twoDigits(current.getMonth() + 1)}/${current.getFullYear()}`;
+};
+
+export const getNextDay = (myDay) => {
+  var current = new Date(convertDate(myDay));
+  current.setDate(current.getDate() + 1);
+  return `${twoDigits(current.getDate())}/${twoDigits(
+    current.getMonth() + 1
+  )}/${current.getFullYear()}`;
+};
+export const getNextWeek = (myWeek) => {
+  let myDay = getDaysInWeek(myWeek)[0];
+  let current = new Date(convertDate(myDay));
+  current.setDate(current.getDate() + 7);
+  return getFormatWeekFromDate(
+    `${twoDigits(current.getDate())}/${twoDigits(
+      current.getMonth() + 1
+    )}/${current.getFullYear()}`
+  );
 };

@@ -31,8 +31,10 @@ import {
   getAllDepensesByDate,
   getAllDepensesByMonth,
   getAllDepensesByWeek,
+  updateDepense,
 } from "../backEnd/dao/depenseDao";
 import {
+  addBudget,
   getBudgetByDate,
   getBudgetByMonth,
   getBudgetByWeek,
@@ -45,24 +47,59 @@ import Cash from "../icons/Cash";
 import Save from "../icons/Save";
 import CheckDollar from "../icons/CheckDollar";
 import Bill from "../icons/Bill";
+import CloudSync from "../icons/CloudSync";
+import Month from "../icons/Month";
+import Week from "../icons/Week";
+import {
+  addReintegre,
+  getReintegre,
+  getResidu,
+} from "../backEnd/dao/reintegreDao";
 
 export default function Jour() {
-  const [show, setShow] = useState([false, false, false, false, false, false]);
+  const [show, setShow] = useState([
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
   const [epargne, setEpargne] = useState("");
   const [cash, setCash] = useState("");
-  const [budget, setBudget] = useState();
-  const [reste, setReste] = useState();
+  const [budget, setBudget] = useState("");
+  const [reste, setReste] = useState("");
   const [reintegre, setReintegre] = useState("");
+  const [reintegreMois, setReintegreMois] = useState("");
+  const [reintegreSemaine, setReintegreSemaine] = useState("");
+  const [residu, setResidu] = useState("");
   const week = ["Date", "Dépenses", "Commentaire", "Actions"];
   const { type, date } = useRoute().params;
   const dateType = useContext(DateContext);
   const [formatDate, setFormatDate] = useState();
   const [idToDelete, setIdToDelete] = useState("");
+  const [idToUpdate, setIdToUpdate] = useState("");
 
   const update = () => {
+    getReintegre({ date: formatDate, type: type })
+      .then((val) => {
+        setReintegre(val.reintegre ? val.reintegre : "");
+        setReintegreMois(val.reintegreMois ? val.reintegreMois : "");
+        setReintegreSemaine(val.reintegreSemaine ? val.reintegreSemaine : "");
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    getResidu({ date: formatDate, type: type })
+      .then((val) => {
+        setResidu(val.residu ? val.residu : "");
+      })
+      .catch((e) => {
+        console.log(e);
+      });
     getCash(formatDate, type)
       .then((val) => {
-        console.log(type);
         if (val) {
           setCash(val.cash);
         } else {
@@ -84,8 +121,13 @@ export default function Jour() {
           });
         getBudgetByDate(formatDate)
           .then((val) => {
-            setBudget(val.budget);
-            setReste(val.reste);
+            if (val) {
+              setBudget(val.budget);
+              setReste(val.reste);
+            } else {
+              setBudget("");
+              setReste("");
+            }
           })
           .catch((e) => {
             console.log(e);
@@ -101,8 +143,13 @@ export default function Jour() {
           });
         getBudgetByWeek(formatDate)
           .then((val) => {
-            setBudget(val.budget);
-            setReste(val.reste);
+            if (val) {
+              setBudget(val.budget);
+              setReste(val.reste);
+            } else {
+              setBudget("");
+              setReste("");
+            }
           })
           .catch((e) => {
             console.log(e);
@@ -118,8 +165,13 @@ export default function Jour() {
           });
         getBudgetByMonth(formatDate)
           .then((val) => {
-            setBudget(val.budget);
-            setReste(val.reste);
+            if (val) {
+              setBudget(val.budget);
+              setReste(val.reste);
+            } else {
+              setBudget("");
+              setReste("");
+            }
           })
           .catch((e) => {
             console.log(e);
@@ -152,13 +204,14 @@ export default function Jour() {
         <View style={jourStyles.actionsContainer}>
           <TouchableOpacity
             style={jourStyles.actionIconLeft}
-            onPress={() =>
+            onPress={() => {
               generalModalOpen(1, {
-                date: el.Date,
-                montant: el.Dépense,
-                commentaire: el.Comment,
-              })
-            }
+                date: el.date,
+                montant: el.montant.toString(),
+                commentaire: el.commentaire,
+              });
+              setIdToUpdate(el.id);
+            }}
           >
             <MaterialCommunityIcons
               name="pencil"
@@ -169,13 +222,13 @@ export default function Jour() {
           <TouchableOpacity
             style={jourStyles.actionIconRight}
             onPress={() => {
-              generalModalOpen(5);
+              generalModalOpen(6);
               setIdToDelete(el.id);
             }}
           >
             <FontAwesome5
               name="trash"
-              size={fontSize * 1.2}
+              size={fontSize * 1.1}
               color={fourth_color}
             />
           </TouchableOpacity>
@@ -196,6 +249,20 @@ export default function Jour() {
     }
     return x;
   };
+  const sommeReintegre = () => {
+    let x = 0;
+    let tab = [
+      parseFloat(reintegre),
+      parseFloat(reintegreMois),
+      parseFloat(reintegreSemaine),
+    ];
+    tab.forEach((el) => {
+      if (!isNaN(el)) {
+        x += el;
+      }
+    });
+    return Number(x.toFixed(2));
+  };
   const generalModalClose = (i) => {
     const formik = [
       addFormik,
@@ -203,6 +270,7 @@ export default function Jour() {
       epargneFormik,
       cashFormik,
       reintegreFormik,
+      budgetFormik,
     ];
     let x = show;
     x[i] = false;
@@ -216,8 +284,9 @@ export default function Jour() {
       epargneFormik,
       cashFormik,
       reintegreFormik,
+      budgetFormik,
     ];
-    let x = [false, false, false, false, false, false];
+    let x = [false, false, false, false, false, false, false];
     x[i] = true;
     if (obj) {
       for (let el of Object.keys(obj)) {
@@ -235,7 +304,7 @@ export default function Jour() {
       .catch((e) => {
         console.log(e);
       });
-    generalModalClose(5);
+    generalModalClose(6);
   };
 
   const depenseSchema = yup.object({
@@ -311,8 +380,15 @@ export default function Jour() {
       }
     },
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-      generalModalClose(1);
+      updateDepense(idToUpdate, values)
+        .then((val) => {
+          setContent([...addActionsToData([val]), ...content]);
+          update();
+          generalModalClose(1);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
   });
   const epargneFormik = useFormik({
@@ -414,8 +490,52 @@ export default function Jour() {
       }
     },
     onSubmit: (values) => {
-      setReintegre(values.montant);
-      generalModalClose(4);
+      addReintegre(values)
+        .then(async (val) => {
+          await console.log(val);
+          update();
+          generalModalClose(4);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+  });
+  const budgetFormik = useFormik({
+    initialValues: {
+      budget: budget.toString(),
+    },
+    validateOnChange: false,
+    validate: (values) => {
+      const errors = {};
+      try {
+        budgetFormik.setFieldValue(
+          "budget",
+          evaluate(values.budget).toString()
+        );
+      } catch (error) {
+        try {
+          budgetFormik.setFieldValue(
+            "budget",
+            evaluate(
+              values.budget.substring(1, values.budget.length)
+            ).toString()
+          );
+        } catch (error) {
+          errors.budget = "Veillez saisir un nombre ou une equation valide";
+        }
+        return errors;
+      }
+    },
+    onSubmit: (values) => {
+      addBudget(values)
+        .then((val) => {
+          update();
+          generalModalClose(5);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
   });
   return (
@@ -423,43 +543,16 @@ export default function Jour() {
       <Grid nCols={2} style={jourStyles.miniCardContainer}>
         <ImageBackground
           source={require("../assets/waves.png")}
-          imageStyle={[globalStyles.waveBG, jourStyles.right]}
-        >
-          <Card style={[jourStyles.miniCard, jourStyles.right]}>
-            <View style={jourStyles.miniCardContent}>
-              <Calendar
-                style={{ marginRight: 10 }}
-                filled={true}
-                color={fourth_color}
-                size={2}
-              />
-              <View>
-                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
-                  {capitalise(type)}
-                </Textc>
-                <Textc style={{ marginBottom: 0.35 * fontSize }}>
-                  {formatDate}
-                </Textc>
-              </View>
-            </View>
-          </Card>
-        </ImageBackground>
-        <ImageBackground
-          source={require("../assets/waves.png")}
           imageStyle={[globalStyles.waveBG, jourStyles.left]}
         >
           <Card style={[jourStyles.miniCard, jourStyles.left]}>
             <View style={jourStyles.miniCardContent}>
-              <CheckDollar
-                style={{ marginRight: 10 }}
-                color={fourth_color}
-                size={2}
-              />
+              <Calendar filled={true} color={fourth_color} size={2} />
               <View>
                 <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
-                  Budget
+                  {capitalise(type)}
                 </Textc>
-                <Textc style={jourStyles.p}>{`${budget}DT`}</Textc>
+                <Textc style={jourStyles.p}>{formatDate}</Textc>
               </View>
             </View>
           </Card>
@@ -479,12 +572,7 @@ export default function Jour() {
                 })
               }
             >
-              <Cash
-                style={{ marginRight: 10 }}
-                filled={true}
-                color={fourth_color}
-                size={2}
-              />
+              <Cash filled={true} color={fourth_color} size={2} />
               <View>
                 <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
                   Cash
@@ -496,24 +584,83 @@ export default function Jour() {
             </TouchableOpacity>
           </Card>
         </ImageBackground>
+
+        <ImageBackground
+          source={require("../assets/waves.png")}
+          imageStyle={[globalStyles.waveBG, jourStyles.left]}
+        >
+          <Card style={[jourStyles.miniCard, jourStyles.left]}>
+            <TouchableOpacity
+              style={jourStyles.miniCardContent}
+              onPress={() =>
+                generalModalOpen(5, {
+                  date: formatDate,
+                  type: type,
+                  budget: budget.toString(),
+                })
+              }
+            >
+              <View style={jourStyles.miniCardContent}>
+                <CheckDollar color={fourth_color} size={2} />
+                <View>
+                  <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                    Budget
+                  </Textc>
+                  <Textc style={jourStyles.p}>
+                    {budget === "" ? "-" : budget + "DT"}
+                  </Textc>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </Card>
+        </ImageBackground>
+        <ImageBackground
+          source={require("../assets/waves.png")}
+          imageStyle={[globalStyles.waveBG, jourStyles.right]}
+        >
+          <Card style={[jourStyles.miniCard, jourStyles.right]}>
+            <TouchableOpacity
+              style={jourStyles.miniCardContent}
+              onPress={() => {
+                generalModalOpen(4, {
+                  date: formatDate,
+                  type: type,
+                  montant: reintegre.toString(),
+                });
+              }}
+            >
+              <Refund filled={true} color={fourth_color} size={2} />
+              <View>
+                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                  Réintégré
+                </Textc>
+                <Textc style={jourStyles.p}>
+                  {reintegre === "" &&
+                  reintegreMois === "" &&
+                  reintegreSemaine === ""
+                    ? "-"
+                    : `${sommeReintegre()}DT`}
+                </Textc>
+              </View>
+            </TouchableOpacity>
+          </Card>
+        </ImageBackground>
+
         <ImageBackground
           source={require("../assets/waves.png")}
           imageStyle={[globalStyles.waveBG, jourStyles.left]}
         >
           <Card style={[jourStyles.miniCard, jourStyles.left]}>
             <View style={jourStyles.miniCardContent}>
-              <Bill
-                style={{ marginRight: 10 }}
-                filled={true}
-                color={fourth_color}
-                size={2}
-              />
+              <Bill filled={true} color={fourth_color} size={2} />
               <View>
                 <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
                   Dépenses
                 </Textc>
                 <Textc style={jourStyles.p}>
-                  {`${sommeDepenses(content)}DT`}
+                  {sommeDepenses(content) === 0
+                    ? "-"
+                    : sommeDepenses(content) + "DT"}
                 </Textc>
               </View>
             </View>
@@ -527,38 +674,6 @@ export default function Jour() {
             <TouchableOpacity
               style={jourStyles.miniCardContent}
               onPress={() =>
-                generalModalOpen(4, {
-                  date: formatDate,
-                  type: type,
-                  montant: reintegre,
-                })
-              }
-            >
-              <Refund
-                style={{ marginRight: 10 }}
-                filled={true}
-                color={fourth_color}
-                size={2}
-              />
-              <View>
-                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
-                  Réintégré
-                </Textc>
-                <Textc style={jourStyles.p}>
-                  {reintegre === "" ? "-" : `${reintegre}DT`}
-                </Textc>
-              </View>
-            </TouchableOpacity>
-          </Card>
-        </ImageBackground>
-        <ImageBackground
-          source={require("../assets/waves.png")}
-          imageStyle={[globalStyles.waveBG, jourStyles.left]}
-        >
-          <Card style={[jourStyles.miniCard, jourStyles.left]}>
-            <TouchableOpacity
-              style={jourStyles.miniCardContent}
-              onPress={() =>
                 generalModalOpen(2, {
                   date: formatDate,
                   type: type,
@@ -566,7 +681,7 @@ export default function Jour() {
                 })
               }
             >
-              <Save style={{ marginRight: 10 }} color={fourth_color} size={2} />
+              <Save color={fourth_color} size={2} />
               <View>
                 <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
                   Épargné
@@ -580,20 +695,41 @@ export default function Jour() {
         </ImageBackground>
         <ImageBackground
           source={require("../assets/waves.png")}
-          imageStyle={[globalStyles.waveBG]}
+          imageStyle={[globalStyles.waveBG, jourStyles.left]}
         >
-          <Card style={[jourStyles.miniCard]}>
+          <Card style={[jourStyles.miniCard, jourStyles.left]}>
             <View style={[jourStyles.miniCardContent]}>
               <Wallet
-                style={{ marginRight: 30, transform: [{ rotate: "-45deg" }] }}
+                style={{ marginLeft: 4, transform: [{ rotate: "-45deg" }] }}
                 color={fourth_color}
-                size={2}
+                size={1.8}
               />
               <View>
                 <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
                   Reste
                 </Textc>
-                <Textc style={jourStyles.p}>{`${reste}DT`}</Textc>
+                <Textc style={jourStyles.p}>
+                  {reste === "" ? "-" : reste + "DT"}
+                </Textc>
+              </View>
+            </View>
+          </Card>
+        </ImageBackground>
+
+        <ImageBackground
+          source={require("../assets/waves.png")}
+          imageStyle={[globalStyles.waveBG, jourStyles.right]}
+        >
+          <Card style={[jourStyles.miniCard, jourStyles.right]}>
+            <View style={jourStyles.miniCardContent}>
+              <CloudSync color={fourth_color} size={2} />
+              <View>
+                <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                  Résidu
+                </Textc>
+                <Textc style={jourStyles.p}>
+                  {residu != 0 ? residu + "DT" : "-"}
+                </Textc>
               </View>
             </View>
           </Card>
@@ -625,11 +761,11 @@ export default function Jour() {
       </Card>
 
       <Modalc show={show[0]} closeFunction={() => generalModalClose(0)}>
-        <View className="depense-modal">
+        <View>
           <Textc color="fourth" style={confirmModalStyles.h1}>
             Tu as encore depensé !
           </Textc>
-          <View style={"form"}>
+          <View>
             {type !== "jour" ? (
               <Input
                 color={fourth_color}
@@ -680,11 +816,11 @@ export default function Jour() {
       </Modalc>
 
       <Modalc show={show[1]} closeFunction={() => generalModalClose(1)}>
-        <View className="depense-modal">
+        <View>
           <Textc color="fourth" style={confirmModalStyles.h1}>
             Encore une modification ?
           </Textc>
-          <View style={"form"}>
+          <View>
             {type !== "jour" ? (
               <Input
                 color={fourth_color}
@@ -733,11 +869,11 @@ export default function Jour() {
         </View>
       </Modalc>
       <Modalc show={show[2]} closeFunction={() => generalModalClose(2)}>
-        <View className="depense-modal">
+        <View>
           <Textc color="fourth" style={confirmModalStyles.h1}>
             Qui n'épargne pas un sou n'en aura jamais deux !
           </Textc>
-          <View style={"form"}>
+          <View>
             <Input
               color={fourth_color}
               type="number"
@@ -766,11 +902,11 @@ export default function Jour() {
       </Modalc>
 
       <Modalc show={show[3]} closeFunction={() => generalModalClose(3)}>
-        <View className="depense-modal">
+        <View>
           <Textc color="fourth" style={confirmModalStyles.h1}>
             Le cash est à l'entreprise ce que le sang est à l'organisme!
           </Textc>
-          <View style={"form"}>
+          <View>
             <Input
               color={fourth_color}
               type="number"
@@ -799,18 +935,64 @@ export default function Jour() {
       </Modalc>
 
       <Modalc show={show[4]} closeFunction={() => generalModalClose(4)}>
-        <View className="depense-modal">
+        <View>
           <Textc color="fourth" style={confirmModalStyles.h1}>
-            Le cash est à l'entreprise ce que le sang est à l'organisme!
+            {type === "jour"
+              ? "Réintégré aux prochains :"
+              : type === "semaine"
+              ? "Réintégré à la prochaine semaine :"
+              : "Réintégré au prochain mois :"}
           </Textc>
-          <View style={"form"}>
+          {type === "jour" ? (
+            <Grid nCols={2}>
+              <ImageBackground
+                source={require("../assets/waves.png")}
+                imageStyle={[globalStyles.waveBG, jourStyles.leftM]}
+              >
+                <Card style={[jourStyles.miniCard, jourStyles.leftM]}>
+                  <View style={jourStyles.miniCardContent}>
+                    <Month filled={true} color={fourth_color} size={2} />
+                    <View>
+                      <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                        Mois
+                      </Textc>
+                      <Textc style={jourStyles.p}>
+                        {reintegreMois !== "" ? `${reintegreMois}DT` : "-"}
+                      </Textc>
+                    </View>
+                  </View>
+                </Card>
+              </ImageBackground>
+              <ImageBackground
+                source={require("../assets/waves.png")}
+                imageStyle={[globalStyles.waveBG, jourStyles.rightM]}
+              >
+                <Card style={[jourStyles.miniCard, jourStyles.rightM]}>
+                  <View style={jourStyles.miniCardContent}>
+                    <Week filled={true} color={fourth_color} size={2} />
+                    <View>
+                      <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
+                        Semaine
+                      </Textc>
+                      <Textc style={jourStyles.p}>
+                        {reintegreSemaine !== ""
+                          ? `${reintegreSemaine}DT`
+                          : "-"}
+                      </Textc>
+                    </View>
+                  </View>
+                </Card>
+              </ImageBackground>
+            </Grid>
+          ) : null}
+          <View>
             <Input
               color={fourth_color}
               type="number"
               onChange={(val) => reintegreFormik.setFieldValue("montant", val)}
               value={reintegreFormik.values.montant}
               id="montant"
-              placeholder="Montant"
+              placeholder={type === "jour" ? "Jour" : "Montant"}
               error={reintegreFormik.errors?.montant}
             />
             <View style={modalStyles.modalBtnContainer}>
@@ -830,9 +1012,41 @@ export default function Jour() {
           </View>
         </View>
       </Modalc>
+      <Modalc show={show[5]} closeFunction={() => generalModalClose(5)}>
+        <View>
+          <Textc color="fourth" style={confirmModalStyles.h1}>
+            Le budget est à l'entreprise ce que le sang est à l'organisme!
+          </Textc>
+          <View>
+            <Input
+              color={fourth_color}
+              type="number"
+              onChange={(val) => budgetFormik.setFieldValue("budget", val)}
+              value={budgetFormik.values.budget}
+              id="montant"
+              placeholder="Montant"
+              error={budgetFormik.errors?.budget}
+            />
+            <View style={modalStyles.modalBtnContainer}>
+              <RoundButton
+                btnStyle={modalStyles.roundBtn}
+                textStyle={modalStyles.roundBtnText}
+                onPress={budgetFormik.handleSubmit}
+                title="Confirmer"
+              />
+              <RoundButton
+                btnStyle={modalStyles.roundBtn}
+                textStyle={modalStyles.roundBtnText}
+                onPress={() => generalModalClose(5)}
+                title="Annuler"
+              />
+            </View>
+          </View>
+        </View>
+      </Modalc>
       <ConfirmModal
-        show={show[5]}
-        closeFunction={() => generalModalClose(5)}
+        show={show[6]}
+        closeFunction={() => generalModalClose(6)}
         text="Voulez vous supprimer cet element ?"
         confirmFunction={() => confirmFunction()}
       />

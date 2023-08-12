@@ -34,12 +34,12 @@ export default function Modalc({ show, closeFunction, children }) {
           modalStyles.openModalContainer,
         ]}
       >
-        <TouchableWithoutFeedback
-          onPress={closeFunction ? closeFunction : null}
-        >
-          <View style={modalStyles.openModalFilter}></View>
-        </TouchableWithoutFeedback>
         <View style={modalStyles.cardContainer}>
+          <TouchableWithoutFeedback
+            onPress={closeFunction ? closeFunction : null}
+          >
+            <View style={modalStyles.openModalFilter}></View>
+          </TouchableWithoutFeedback>
           <Card style={modalStyles.modalCard}>
             <TouchableOpacity
               style={modalStyles.modalCloseBtn}
