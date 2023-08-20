@@ -1,34 +1,37 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-  TouchableOpacity,
-  View,
-  Animated,
-  Dimensions,
-  BackHandler,
-} from "react-native";
+import React, { useContext, useEffect } from "react";
+import { TouchableOpacity, View, BackHandler } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { deg } from "react-native-linear-gradient-degree";
 import Textc from "./Textc";
 import { DateContext, getWeekFromDate, twoDigits } from "../utils/functions";
 import { sidebarStyles } from "../styles/sidebar";
 import { fourth_color, second_color, third_color } from "../styles/vars";
-import { Keyboard } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Day from "../icons/Day";
 import Calendar from "../icons/Calendar";
-import Budget from "../icons/Budget";
 import Home from "../icons/Home";
 import Week from "../icons/Week";
 import Month from "../icons/Month";
+import Save from "../icons/Save";
+import ErrorModal from "./ErrorModal";
 
 export default function Sidebar(props) {
-  const useEffectCounter = useRef(0);
   const date = new Date();
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  const [pageDate, setPageDate, type, setType, currentRoute, setCurrentRoute] =
-    useContext(DateContext);
+  const [
+    pageDate,
+    setPageDate,
+    type,
+    setType,
+    currentRoute,
+    setCurrentRoute,
+    errorShow,
+    setErrorShow,
+    errorMsg,
+    setErrorMsg,
+  ] = useContext(DateContext);
   const navigation = useNavigation();
   useEffect(() => {
     const backAction = () => {
@@ -85,25 +88,7 @@ export default function Sidebar(props) {
             Accueil
           </Textc>
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          style={sidebarStyles.sidebarItem}
-          onPress={() => {
-            setCurrentRoute("Budgetisation");
-            navigation?.navigate("Budgetisation");
-          }}
-        >
-          <Budget
-            color={fourth_color}
-            size={2}
-            filled={
-              navigation?.getCurrentRoute()?.name === "Budgetisation" ||
-              currentRoute === "Budgetisation"
-            }
-          />
-          <Textc color="fourth" style={sidebarStyles.gradientText}>
-            Budgets
-          </Textc>
-        </TouchableOpacity> */}
+
         <TouchableOpacity
           style={sidebarStyles.sidebarItem}
           onPress={() => {
@@ -195,6 +180,30 @@ export default function Sidebar(props) {
             Mon mois
           </Textc>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={sidebarStyles.sidebarItem}
+          onPress={() => {
+            setCurrentRoute("Budgetisation");
+            navigation?.navigate("Budgetisation");
+          }}
+        >
+          <Save
+            color={fourth_color}
+            size={2}
+            filled={
+              navigation?.getCurrentRoute()?.name === "Budgetisation" ||
+              currentRoute === "Budgetisation"
+            }
+          />
+          <Textc color="fourth" style={sidebarStyles.gradientText}>
+            Épargne
+          </Textc>
+        </TouchableOpacity>
+        <ErrorModal
+          show={errorShow}
+          text={errorMsg}
+          closeFunction={() => setErrorShow(false)}
+        />
       </View>
     </View>
   );

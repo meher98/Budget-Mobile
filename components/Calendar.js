@@ -77,14 +77,6 @@ function Calendar({
         <View style={[calendarStyles.ul]}>
           {allowChangeMonth ? (
             <TouchableOpacity onPress={() => prevMonth()}>
-              {/* <Textc
-                color="base"
-                key="prev"
-                touchStyle={[calendarStyles.prev, calendarStyles.liMonth]}
-                style={{ fontSize: 20 }}
-              >
-                &#10094;
-              </Textc> */}
               <AntDesign name="leftcircle" size={24} color={base_color} />
             </TouchableOpacity>
           ) : null}

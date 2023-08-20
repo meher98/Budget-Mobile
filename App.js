@@ -7,12 +7,13 @@ import { useEffect, useRef, useState } from "react";
 import Test from "./pages/Test";
 import Jour from "./pages/Jour";
 import { DateContext } from "./utils/functions";
-import Budgetisation from "./pages/Budgetisation";
 import { sequelize } from "./backEnd/options";
 import { useFonts } from "expo-font";
 import * as LocalAuthentication from "expo-local-authentication";
 import Login from "./pages/Login";
 import { AppState } from "react-native";
+import Epargne from "./pages/Epargne";
+
 // import * as SplashScreen from "expo-splash-screen";
 
 // SplashScreen.preventAutoHideAsync();
@@ -37,9 +38,12 @@ export default function App() {
 
       // Authenticate user
       let success = await LocalAuthentication.authenticateAsync();
-      setAuth(success.success);
+      await setAuth(success.success);
+      if (success.success) {
+        setCurrentRoute("Home");
+      }
     } catch (error) {
-      console.log("An error as occured", error?.message);
+      console.log("An error has occured", error?.message);
     }
   };
   const [fontsLoaded] = useFonts({
@@ -48,8 +52,8 @@ export default function App() {
   });
   const appState = useRef(AppState.currentState);
   useEffect(() => {
-    sequelize.sync({ force: true });
-    // sequelize.sync();
+    // sequelize.sync({ force: true });
+    sequelize.sync();
     // if (fontsLoaded) {
     //   await SplashScreen.hideAsync();
     // }
@@ -79,12 +83,25 @@ export default function App() {
   const [date, setDate] = useState("");
   const [type, setType] = useState("");
   const [currentRoute, setCurrentRoute] = useState("");
+  const [errorShow, setErrorShow] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   if (!fontsLoaded) {
     return null;
   }
   return (
     <DateContext.Provider
-      value={[date, setDate, type, setType, currentRoute, setCurrentRoute]}
+      value={[
+        date,
+        setDate,
+        type,
+        setType,
+        currentRoute,
+        setCurrentRoute,
+        errorShow,
+        setErrorShow,
+        errorMsg,
+        setErrorMsg,
+      ]}
     >
       <NavigationContainer theme={navTheme}>
         <StatusBar style="light" />
@@ -113,16 +130,16 @@ export default function App() {
                 name="Calendrier"
                 component={Calendrier}
               />
-              {/* <Stack.Screen
-              options={{
-                headerShown: false,
-                cardStyle: {
-                  backgroundColor: "transparent",
-                },
-              }}
-              name="Budgetisation"
-              component={Budgetisation}
-            /> */}
+              <Stack.Screen
+                options={{
+                  headerShown: false,
+                  cardStyle: {
+                    backgroundColor: "transparent",
+                  },
+                }}
+                name="Budgetisation"
+                component={Epargne}
+              />
               <Stack.Screen
                 options={{
                   headerShown: false,

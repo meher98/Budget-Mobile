@@ -4,7 +4,8 @@ import { tableStyles } from "../styles/table";
 import Textc from "./Textc";
 import { dateDisplay } from "../utils/functions";
 import { base_color } from "../styles/vars";
-
+import Pagination from "./Pagination";
+const d = 6;
 const Table = ({
   headers,
   content,
@@ -14,6 +15,7 @@ const Table = ({
   dateIndexTab,
 }) => {
   const [filtredContent, setFiltredContent] = useState([]);
+  const [index, setIndex] = useState();
   useEffect(() => {
     let tab = content.map((el) => {
       let filtredEl = {};
@@ -25,6 +27,7 @@ const Table = ({
       return filtredEl;
     });
     setFiltredContent([...tab]);
+    setIndex(1);
   }, [content]);
 
   const transpose = (arr) => {
@@ -85,7 +88,7 @@ const Table = ({
             <Textc>Tableau vide</Textc>
           </View>
         ) : (
-          filtredContent.map((row, i) => (
+          filtredContent.slice((index - 1) * d, index * d).map((row, i) => (
             <View
               style={
                 i === filtredContent.length - 1
@@ -125,6 +128,14 @@ const Table = ({
           ))
         )}
       </View>
+      {filtredContent.length / d > 1 ? (
+        <Pagination
+          d={d}
+          n={filtredContent.length}
+          index={index}
+          setIndex={setIndex}
+        />
+      ) : null}
     </View>
   );
 };

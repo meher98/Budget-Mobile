@@ -1,12 +1,17 @@
 import { useFormik } from "formik";
 import { evaluate } from "mathjs";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Card from "../components/Card";
 import Table from "../components/Table";
 import * as yup from "yup";
 import Input from "../components/Input";
 import Modalc from "../components/Modal";
-import { timeToDate, dateDiffrence, dateToTime } from "../utils/functions";
+import {
+  timeToDate,
+  dateDiffrence,
+  dateToTime,
+  DateContext,
+} from "../utils/functions";
 import { globalStyles } from "../styles/global";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import RoundButton from "../components/RoundButton";
@@ -23,6 +28,8 @@ import {
 } from "../backEnd/dao/budgetGlobalDao";
 
 export default function Budgetisation() {
+  const [, errorShow, setErrorShow, errorMsg, setErrorMsg] =
+    useContext(DateContext);
   const [content, setContent] = useState([]);
   const [show, setShow] = useState([false, false]);
   const [maxD, setMaxD] = useState("01/01/2000");
@@ -113,7 +120,8 @@ export default function Budgetisation() {
           addToContent(v);
         })
         .catch((e) => {
-          console.log(e);
+          setErrorMsg(e.msg);
+          setErrorShow(true);
         });
 
       generalModalClose(0);

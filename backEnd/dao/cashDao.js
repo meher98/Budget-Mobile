@@ -15,7 +15,6 @@ export const addOrUpdateCash = async (date, type, val) =>
       let cash = await Cash.findOne({ where: { date: date, type: type } });
       if (cash) {
         cash.cash = Number(parseFloat(val).toFixed(2));
-        console.log(cash.cash);
         await cash.save();
         resolve(cash);
       } else {

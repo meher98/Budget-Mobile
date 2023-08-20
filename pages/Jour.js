@@ -76,7 +76,18 @@ export default function Jour() {
   const [residu, setResidu] = useState("");
   const week = ["Date", "Dépenses", "Commentaire", "Actions"];
   const { type, date } = useRoute().params;
-  const dateType = useContext(DateContext);
+  const [
+    pageDate,
+    setPageDate,
+    typeD,
+    setType,
+    currentRoute,
+    setCurrentRoute,
+    errorShow,
+    setErrorShow,
+    errorMsg,
+    setErrorMsg,
+  ] = useContext(DateContext);
   const [formatDate, setFormatDate] = useState();
   const [idToDelete, setIdToDelete] = useState("");
   const [idToUpdate, setIdToUpdate] = useState("");
@@ -89,14 +100,16 @@ export default function Jour() {
         setReintegreSemaine(val.reintegreSemaine ? val.reintegreSemaine : "");
       })
       .catch((e) => {
-        console.log(e);
+        setErrorMsg(e.toString());
+        setErrorShow(true);
       });
     getResidu({ date: formatDate, type: type })
       .then((val) => {
         setResidu(val.residu ? val.residu : "");
       })
       .catch((e) => {
-        console.log(e);
+        setErrorMsg(e.toString());
+        setErrorShow(true);
       });
     getCash(formatDate, type)
       .then((val) => {
@@ -108,7 +121,8 @@ export default function Jour() {
         }
       })
       .catch((e) => {
-        console.log(e);
+        setErrorMsg(e.toString());
+        setErrorShow(true);
       });
     switch (type) {
       case "jour":
@@ -191,8 +205,8 @@ export default function Jour() {
   }, [date, type, formatDate]);
 
   useEffect(() => {
-    dateType[1](date);
-    dateType[3](type);
+    setPageDate(date);
+    setType(type);
   }, [date, type]);
 
   const [content, setContent] = useState([]);
@@ -302,7 +316,8 @@ export default function Jour() {
         update();
       })
       .catch((e) => {
-        console.log(e);
+        setErrorMsg(e.toString());
+        setErrorShow(true);
       });
     generalModalClose(6);
   };
@@ -346,7 +361,8 @@ export default function Jour() {
           generalModalClose(0);
         })
         .catch((e) => {
-          console.log(e);
+          setErrorMsg(e.toString());
+          setErrorShow(true);
         });
     },
   });
@@ -387,7 +403,8 @@ export default function Jour() {
           generalModalClose(1);
         })
         .catch((e) => {
-          console.log(e);
+          setErrorMsg(e.toString());
+          setErrorShow(true);
         });
     },
   });
@@ -457,7 +474,8 @@ export default function Jour() {
           generalModalClose(3);
         })
         .catch((e) => {
-          console.log(e);
+          setErrorMsg(e.toString());
+          setErrorShow(true);
         });
     },
   });
@@ -492,12 +510,12 @@ export default function Jour() {
     onSubmit: (values) => {
       addReintegre(values)
         .then(async (val) => {
-          await console.log(val);
           update();
           generalModalClose(4);
         })
         .catch((e) => {
-          console.log(e);
+          setErrorMsg(e.toString());
+          setErrorShow(true);
         });
     },
   });
@@ -534,7 +552,8 @@ export default function Jour() {
           generalModalClose(5);
         })
         .catch((e) => {
-          console.log(e);
+          setErrorMsg(e.toString());
+          setErrorShow(true);
         });
     },
   });
@@ -681,7 +700,7 @@ export default function Jour() {
                 })
               }
             >
-              <Save color={fourth_color} size={2} />
+              <Save color={fourth_color} size={2} filled />
               <View>
                 <Textc style={[jourStyles.p, jourStyles.miniCardTitle]}>
                   Épargné
@@ -1015,7 +1034,8 @@ export default function Jour() {
       <Modalc show={show[5]} closeFunction={() => generalModalClose(5)}>
         <View>
           <Textc color="fourth" style={confirmModalStyles.h1}>
-            Le budget est à l'entreprise ce que le sang est à l'organisme!
+            La règle d'or des finances personnelles : dépensez moins que ce que
+            vous gagnez.
           </Textc>
           <View>
             <Input

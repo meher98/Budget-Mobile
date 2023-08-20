@@ -10,8 +10,6 @@ export default function Card({ gradientStyle, children, style, ...props }) {
       style={[cardStyles.cardContainer, style]}
     >
       {children}
-
-      {/* {children} */}
     </ScrollView>
   );
 }

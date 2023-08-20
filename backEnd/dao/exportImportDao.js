@@ -32,9 +32,7 @@ export const exportData = async () => {
           encoding: FileSystem.EncodingType.UTF8,
         });
       })
-      .catch((e) => {
-        console.log(e);
-      });
+      .catch((e) => {});
   }
 };
 export const importData = async () => {
@@ -55,6 +53,5 @@ export const importData = async () => {
     await t.commit();
   } catch (error) {
     await t.rollback();
-    console.log(error);
   }
 };

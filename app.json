@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Budget",
-    "slug": "Budget",
+    "name": "Save",
+    "slug": "save",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,14 +25,14 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#17263d"
       },
-      "package": "com.meher98.budgetmobile"
+      "package": "com.save"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "fc5495de-e812-4d11-be27-e714360e58b3"
+        "projectId": "4873a2d9-913d-46f6-bb8f-fadafbc8ddea"
       }
     }
   }

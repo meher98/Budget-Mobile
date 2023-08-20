@@ -13,7 +13,10 @@ const { JsonCalendar } = require("json-calendar");
 export const getAllDepensesByDate = async (date) =>
   new Promise(async (resolve, reject) => {
     try {
-      let all = await Depense.findAll({ where: { date: date } });
+      let all = await Depense.findAll({
+        where: { date: date },
+        order: [["id", "DESC"]],
+      });
       resolve(
         all.map((el) => {
           return {
@@ -45,7 +48,7 @@ export const getAllDepensesByWeek = async (week) =>
         )
           .then((val) => val)
           .catch((e) => reject(e));
-        all.push(...x);
+        all.unshift(...x);
       }
 
       resolve(
@@ -72,6 +75,7 @@ export const getAllDepensesByMonth = async (month) =>
             [Sequelize.Op.like]: `%${month}`,
           },
         },
+        order: [["id", "DESC"]],
       });
       resolve(
         all.map((el) => {
